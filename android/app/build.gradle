@@ -1,0 +1,50 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "com.example.easy_stock_copy"
+    compileSdk = 35
+    ndkVersion = "25.1.8937393"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    defaultConfig {
+        applicationId = "com.example.easy_stock_copy"
+        
+        // If flutter.minSdkVersion and flutter.targetSdkVersion are defined in flutter.gradle,
+        // this will work. If not, replace them with explicit values like 21 for minSdkVersion and 33 for targetSdkVersion.
+        minSdk = 21
+        targetSdk = 35
+        // flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Using debug signing config so `flutter run --release` works temporarily.
+            signingConfig = signingConfigs.debug
+            // Enable shrinking, obfuscation, and optimization for release builds
+            minifyEnabled true
+
+        // Specify the ProGuard rules file(s)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
