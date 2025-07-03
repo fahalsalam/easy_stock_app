@@ -19,12 +19,14 @@ class LpoinvoicePage extends StatefulWidget {
   String lpoNumber;
   String customerName;
   Header header;
+  String invoiceType;
   LpoinvoicePage(
       {super.key,
       required this.dataList,
       required this.lpoNumber,
       required this.header,
-      required this.customerName});
+      required this.customerName,
+      required this.invoiceType});
 
   @override
   State<LpoinvoicePage> createState() => _CompletedInvoicePageState();
@@ -80,7 +82,7 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
 
     // **Centered TAX INVOICE Title**
     bytes += generator.text(
-      centerText('DELIVERY NOTE'),
+      centerText('${widget.invoiceType}'),
       styles: const PosStyles(height: PosTextSize.size2, bold: true),
     );
 
@@ -337,7 +339,7 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [],
                         ),
-                        pw.Text('DELIVERY NOTE',
+                        pw.Text(widget.invoiceType,
                             style: pw.TextStyle(
                                 fontSize: 24, fontWeight: pw.FontWeight.bold)),
                         pw.SizedBox(height: 5),

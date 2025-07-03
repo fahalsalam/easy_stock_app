@@ -68,13 +68,14 @@ class _BpoListPageState extends State<BpoListPage> with RouteAware {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
+          // Positioned(
+          //   top: screenHeight * 0.05,
+          //   left: screenWidth * 0.05,
+          //   child: CustomAppBar(txt: "BPO"),
+          // ),
           Positioned(
             top: screenHeight * 0.05,
-            left: screenWidth * 0.05,
-            child: CustomAppBar(txt: "BPO"),
-          ),
-          Positioned(
-            top: screenHeight * 0.13,
+            // screenHeight * 0.13,
             left: 0,
             right: 0,
             bottom: 0,
@@ -84,17 +85,21 @@ class _BpoListPageState extends State<BpoListPage> with RouteAware {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white24, width: 1),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.shopping_cart_outlined,
-                            color: Colors.white, size: 16),
+                        InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.arrow_back,
+                                color: Colors.white, size: 22)),
                         SizedBox(width: 6),
                         Text(
                           "BPO List",
@@ -165,7 +170,7 @@ class _BpoListPageState extends State<BpoListPage> with RouteAware {
                           : Consumer<BpoProvider>(
                               builder: (context, provider, child) {
                                 return Container(
-                                  height: screenHeight * 0.65,
+                                  height: screenHeight * 0.82,
                                   decoration: BoxDecoration(
                                     color: Colors.black.withOpacity(0.3),
                                     borderRadius: BorderRadius.circular(8),

@@ -188,14 +188,14 @@ class _EditCustomerPageState extends State<EditCustomerPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildTextField(
-                            label: "ID",
-                            controller: customerManagementProvider
-                                .editcustomerIdController,
-                            hintText: "Customer ID",
-                            onClear: () =>
-                                customerManagementProvider.customerID.clear(),
-                          ),
+                          // _buildTextField(
+                          //   label: "ID",
+                          //   controller: customerManagementProvider
+                          //       .editcustomerIdController,
+                          //   hintText: "Customer ID",
+                          //   onClear: () =>
+                          //       customerManagementProvider.customerID.clear(),
+                          // ),
                           _buildTextField(
                             label: "Name",
                             controller: customerManagementProvider
@@ -203,18 +203,26 @@ class _EditCustomerPageState extends State<EditCustomerPage> {
                             hintText: "Name",
                           ),
                           _buildTextField(
-                            label: "Group",
+                            label: "Address",
                             controller: customerManagementProvider
                                 .editcustomerGroupController,
-                            hintText: "Customer Group",
+                            hintText: "Enter Address",
                             onClear: () =>
                                 customerManagementProvider.customerID.clear(),
                           ),
                           _buildTextField(
-                            label: "City",
+                            label: "Trn No",
                             controller: customerManagementProvider
                                 .editcustomerCityController,
-                            hintText: "Customer City",
+                            hintText: "Enter Trn No",
+                            onClear: () =>
+                                customerManagementProvider.customerID.clear(),
+                          ),
+                          _buildTextField(
+                            label: "Mobile No",
+                            controller: customerManagementProvider
+                                .editcustomerCityController,
+                            hintText: "Enter Mobile No",
                             onClear: () =>
                                 customerManagementProvider.customerID.clear(),
                           ),

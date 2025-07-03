@@ -32,6 +32,8 @@ class _BpoDetailsPageState extends State<BpoDetailsPage> {
   TextEditingController priceController = TextEditingController();
   bool isvisible = false;
   int visibleindex = -1;
+  Set<int> selectedItems = {};
+
   @override
   void initState() {
     super.initState();
@@ -279,12 +281,12 @@ class _BpoDetailsPageState extends State<BpoDetailsPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
+          // Positioned(
+          //     top: screenHeight * 0.05,
+          //     left: screenWidth * 0.05,
+          //     child: CustomAppBar(txt: "BPO Details")),
           Positioned(
-              top: screenHeight * 0.05,
-              left: screenWidth * 0.05,
-              child: CustomAppBar(txt: "BPO Details")),
-          Positioned(
-            top: screenHeight * 0.13,
+            top: screenHeight * 0.05,
             left: 0,
             right: 0,
             bottom: 0,
@@ -293,6 +295,35 @@ class _BpoDetailsPageState extends State<BpoDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white24, width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(Icons.arrow_back,
+                                color: Colors.white, size: 22)),
+                        const SizedBox(width: 6),
+                        const Text(
+                          "BPO Details",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -362,277 +393,517 @@ class _BpoDetailsPageState extends State<BpoDetailsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 6),
                   Consumer<BpoProvider>(
                     builder: (context, provider, child) {
                       return Container(
-                        height: screenHeight * 0.5,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white24, width: 1),
-                        ),
-                        child: isLoading || bpodetailsProvider.isLoading
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const CircularProgressIndicator(
-                                      color: primaryColor,
-                                      strokeWidth: 3,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      "Loading details...",
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
-                                        fontSize: 14,
+                          height: screenHeight * 0.54,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white24, width: 1),
+                          ),
+                          child: isLoading || bpodetailsProvider.isLoading
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const CircularProgressIndicator(
+                                        color: primaryColor,
+                                        strokeWidth: 3,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : provider.details.isEmpty
-                                ? Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.shopping_cart_outlined,
-                                          size: 48,
-                                          color: Colors.white.withOpacity(0.5),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        "Loading details...",
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 14,
                                         ),
-                                        const SizedBox(height: 16),
-                                        const Text(
-                                          "No Details Found",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.all(12),
-                                    itemCount: provider.details.length,
-                                    itemBuilder: (context, index) {
-                                      BpoDetailsDatum detail =
-                                          provider.details[index];
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12),
-                                        child: Container(
-                                          decoration: BoxDecoration(
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : provider.details.isEmpty
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.shopping_cart_outlined,
+                                            size: 48,
                                             color:
-                                                Colors.white.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            border: Border.all(
-                                                color: Colors.white24,
-                                                width: 1),
+                                                Colors.white.withOpacity(0.5),
                                           ),
-                                          child: Column(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(16),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            "No Details Found",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding: const EdgeInsets.all(12),
+                                      itemCount: provider.details.length,
+                                      itemBuilder: (context, index) {
+                                        BpoDetailsDatum detail =
+                                            provider.details[index];
+                                        bool isChecked =
+                                            selectedItems.contains(index);
+
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 12),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.white.withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                  color: Colors.white24,
+                                                  width: 1),
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(16),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      // ✅ Checkbox Column
+                                                      Column(
                                                         children: [
-                                                          Text(
-                                                            detail.customerName,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          Row(
-                                                            children: [
-                                                              Container(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        8,
-                                                                    vertical:
-                                                                        4),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white
-                                                                      .withOpacity(
-                                                                          0.1),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              4),
-                                                                ),
-                                                                child: Text(
-                                                                  '${double.parse(detail.qty).toStringAsFixed(2)} ${detail.uomCode}',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color:
-                                                                        primaryColor,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  width: 8),
-                                                              Container(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        8,
-                                                                    vertical:
-                                                                        4),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: primaryColor
-                                                                      .withOpacity(
-                                                                          0.2),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              4),
-                                                                ),
-                                                                child: Text(
-                                                                  'AED ${double.parse(detail.total).toStringAsFixed(2)}',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color:
-                                                                        primaryColor,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
+                                                          Checkbox(
+                                                            value: isChecked,
+                                                            activeColor:
+                                                                primaryColor,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                if (value ==
+                                                                    true) {
+                                                                  selectedItems
+                                                                      .add(
+                                                                          index);
+                                                                } else {
+                                                                  selectedItems
+                                                                      .remove(
+                                                                          index);
+                                                                }
+                                                              });
+                                                            },
                                                           ),
                                                         ],
                                                       ),
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          if (selectedIndex ==
-                                                              index) {
-                                                            selectedIndex =
-                                                                null;
-                                                          } else {
-                                                            selectedIndex =
-                                                                index;
-                                                          }
-                                                        });
-                                                        setState(() {
-                                                          quantityController
-                                                              .text = double.parse(
-                                                                  bpodetailsProvider
-                                                                      .details[
-                                                                          index]
-                                                                      .qty)
-                                                              .toStringAsFixed(
-                                                                  2);
-                                                          priceController
-                                                              .text = double.parse(
-                                                                  bpodetailsProvider
-                                                                      .details[
-                                                                          index]
-                                                                      .total)
-                                                              .toStringAsFixed(
-                                                                  2);
-                                                          isvisible =
-                                                              !isvisible;
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 12,
-                                                                vertical: 6),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Colors.white
-                                                              .withOpacity(0.1),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(6),
-                                                          border: Border.all(
-                                                              color: Colors
-                                                                  .white24,
-                                                              width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
+                                                      const SizedBox(width: 8),
+                                                      // ✅ Text & Data Column
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            const Text(
-                                                              'Edit',
-                                                              style: TextStyle(
-                                                                color:
-                                                                    primaryColor,
+                                                            Text(
+                                                              detail
+                                                                  .customerName,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 16,
                                                                 fontWeight:
                                                                     FontWeight
-                                                                        .w500,
-                                                                fontSize: 14,
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .white,
                                                               ),
                                                             ),
                                                             const SizedBox(
-                                                                width: 4),
-                                                            Icon(
-                                                              Icons
-                                                                  .edit_outlined,
-                                                              color: Colors
-                                                                  .white
-                                                                  .withOpacity(
-                                                                      0.7),
-                                                              size: 16,
+                                                                height: 8),
+                                                            Row(
+                                                              children: [
+                                                                Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8,
+                                                                      vertical:
+                                                                          4),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .white
+                                                                        .withOpacity(
+                                                                            0.1),
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(4),
+                                                                  ),
+                                                                  child: Text(
+                                                                    '${double.parse(detail.qty).toStringAsFixed(2)} ${detail.uomCode}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          primaryColor,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 8),
+                                                                Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8,
+                                                                      vertical:
+                                                                          4),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: primaryColor
+                                                                        .withOpacity(
+                                                                            0.2),
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(4),
+                                                                  ),
+                                                                  child: Text(
+                                                                    'AED ${double.parse(detail.total).toStringAsFixed(2)}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          primaryColor,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      // ✅ Edit Button
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            selectedIndex =
+                                                                (selectedIndex ==
+                                                                        index)
+                                                                    ? null
+                                                                    : index;
+                                                            quantityController
+                                                                .text = double
+                                                                    .parse(detail
+                                                                        .qty)
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                            priceController
+                                                                .text = double
+                                                                    .parse(detail
+                                                                        .total)
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                            isvisible =
+                                                                !isvisible;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .white24,
+                                                                width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              const Text(
+                                                                'Edit',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color:
+                                                                      primaryColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 14,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 4),
+                                                              Icon(
+                                                                Icons
+                                                                    .edit_outlined,
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        0.7),
+                                                                size: 16,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              if (selectedIndex == index)
-                                                _editQuantity(index),
-                                            ],
+                                                if (selectedIndex == index)
+                                                  _editQuantity(index),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                      );
+                                        );
+                                      },
+                                    )
+
+                          // : ListView.builder(
+                          //     padding: const EdgeInsets.all(12),
+                          //     itemCount: provider.details.length,
+                          //     itemBuilder: (context, index) {
+                          //       BpoDetailsDatum detail =
+                          //           provider.details[index];
+                          //       return Padding(
+                          //         padding:
+                          //             const EdgeInsets.only(bottom: 12),
+                          //         child: Container(
+                          //           decoration: BoxDecoration(
+                          //             color:
+                          //                 Colors.white.withOpacity(0.1),
+                          //             borderRadius:
+                          //                 BorderRadius.circular(12),
+                          //             border: Border.all(
+                          //                 color: Colors.white24,
+                          //                 width: 1),
+                          //           ),
+                          //           child: Column(
+                          //             children: [
+                          //               Padding(
+                          //                 padding:
+                          //                     const EdgeInsets.all(16),
+                          //                 child: Row(
+                          //                   crossAxisAlignment:
+                          //                       CrossAxisAlignment.start,
+                          //                   children: [
+                          //                     Expanded(
+                          //                       child: Column(
+                          //                         crossAxisAlignment:
+                          //                             CrossAxisAlignment
+                          //                                 .start,
+                          //                         children: [
+                          //                           Text(
+                          //                             detail.customerName,
+                          //                             style:
+                          //                                 const TextStyle(
+                          //                               fontSize: 16,
+                          //                               fontWeight:
+                          //                                   FontWeight
+                          //                                       .w600,
+                          //                               color:
+                          //                                   Colors.white,
+                          //                             ),
+                          //                           ),
+                          //                           const SizedBox(
+                          //                               height: 8),
+                          //                           Row(
+                          //                             children: [
+                          //                               Container(
+                          //                                 padding: const EdgeInsets
+                          //                                     .symmetric(
+                          //                                     horizontal:
+                          //                                         8,
+                          //                                     vertical:
+                          //                                         4),
+                          //                                 decoration:
+                          //                                     BoxDecoration(
+                          //                                   color: Colors
+                          //                                       .white
+                          //                                       .withOpacity(
+                          //                                           0.1),
+                          //                                   borderRadius:
+                          //                                       BorderRadius
+                          //                                           .circular(
+                          //                                               4),
+                          //                                 ),
+                          //                                 child: Text(
+                          //                                   '${double.parse(detail.qty).toStringAsFixed(2)} ${detail.uomCode}',
+                          //                                   style:
+                          //                                       const TextStyle(
+                          //                                     fontSize:
+                          //                                         14,
+                          //                                     fontWeight:
+                          //                                         FontWeight
+                          //                                             .w500,
+                          //                                     color:
+                          //                                         primaryColor,
+                          //                                   ),
+                          //                                 ),
+                          //                               ),
+                          //                               const SizedBox(
+                          //                                   width: 8),
+                          //                               Container(
+                          //                                 padding: const EdgeInsets
+                          //                                     .symmetric(
+                          //                                     horizontal:
+                          //                                         8,
+                          //                                     vertical:
+                          //                                         4),
+                          //                                 decoration:
+                          //                                     BoxDecoration(
+                          //                                   color: primaryColor
+                          //                                       .withOpacity(
+                          //                                           0.2),
+                          //                                   borderRadius:
+                          //                                       BorderRadius
+                          //                                           .circular(
+                          //                                               4),
+                          //                                 ),
+                          //                                 child: Text(
+                          //                                   'AED ${double.parse(detail.total).toStringAsFixed(2)}',
+                          //                                   style:
+                          //                                       const TextStyle(
+                          //                                     fontSize:
+                          //                                         14,
+                          //                                     fontWeight:
+                          //                                         FontWeight
+                          //                                             .w500,
+                          //                                     color:
+                          //                                         primaryColor,
+                          //                                   ),
+                          //                                 ),
+                          //                               ),
+                          //                             ],
+                          //                           ),
+                          //                         ],
+                          //                       ),
+                          //                     ),
+                          //                     GestureDetector(
+                          //                       onTap: () {
+                          //                         setState(() {
+                          //                           if (selectedIndex ==
+                          //                               index) {
+                          //                             selectedIndex =
+                          //                                 null;
+                          //                           } else {
+                          //                             selectedIndex =
+                          //                                 index;
+                          //                           }
+                          //                         });
+                          //                         setState(() {
+                          //                           quantityController
+                          //                               .text = double.parse(
+                          //                                   bpodetailsProvider
+                          //                                       .details[
+                          //                                           index]
+                          //                                       .qty)
+                          //                               .toStringAsFixed(
+                          //                                   2);
+                          //                           priceController
+                          //                               .text = double.parse(
+                          //                                   bpodetailsProvider
+                          //                                       .details[
+                          //                                           index]
+                          //                                       .total)
+                          //                               .toStringAsFixed(
+                          //                                   2);
+                          //                           isvisible =
+                          //                               !isvisible;
+                          //                         });
+                          //                       },
+                          //                       child: Container(
+                          //                         padding:
+                          //                             const EdgeInsets
+                          //                                 .symmetric(
+                          //                                 horizontal: 12,
+                          //                                 vertical: 6),
+                          //                         decoration:
+                          //                             BoxDecoration(
+                          //                           color: Colors.white
+                          //                               .withOpacity(0.1),
+                          //                           borderRadius:
+                          //                               BorderRadius
+                          //                                   .circular(6),
+                          //                           border: Border.all(
+                          //                               color: Colors
+                          //                                   .white24,
+                          //                               width: 1),
+                          //                         ),
+                          //                         child: Row(
+                          //                           mainAxisSize:
+                          //                               MainAxisSize.min,
+                          //                           children: [
+                          //                             const Text(
+                          //                               'Edit',
+                          //                               style: TextStyle(
+                          //                                 color:
+                          //                                     primaryColor,
+                          //                                 fontWeight:
+                          //                                     FontWeight
+                          //                                         .w500,
+                          //                                 fontSize: 14,
+                          //                               ),
+                          //                             ),
+                          //                             const SizedBox(
+                          //                                 width: 4),
+                          //                             Icon(
+                          //                               Icons
+                          //                                   .edit_outlined,
+                          //                               color: Colors
+                          //                                   .white
+                          //                                   .withOpacity(
+                          //                                       0.7),
+                          //                               size: 16,
+                          //                             ),
+                          //                           ],
+                          //                         ),
+                          //                       ),
+                          //                     ),
+                          //                   ],
+                          //                 ),
+                          //               ),
+                          //               if (selectedIndex == index)
+                          //                 _editQuantity(index),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          );
                     },
                   ),
                   if (bpodetailsProvider.price.isNotEmpty && !isLoading)
                     Container(
-                      margin: const EdgeInsets.only(top: 16),
+                      margin: const EdgeInsets.only(top: 6),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.3),
@@ -693,7 +964,7 @@ class _BpoDetailsPageState extends State<BpoDetailsPage> {
                         ],
                       ),
                     ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   if (!isLoading)
                     Row(
                       children: [
