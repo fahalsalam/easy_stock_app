@@ -104,29 +104,174 @@ class _LpoOrderListpageState extends State<LpoOrderListpage> {
                                         borderRadius: BorderRadius.circular(8),
                                         onTap: () async {
                                           try {
-                                            await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LpoinvoicePage(
-                                                  dataList:
-                                                      lpoListProvider.details,
-                                                  header: lpoListProvider
-                                                      .header.first,
-                                                  lpoNumber:
-                                                      widget.orderId.toString(),
-                                                  customerName:
-                                                      widget.customerName,
+                                            final selectedType =
+                                                await showDialog<String>(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                backgroundColor: Colors.black,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
                                                 ),
+                                                title: const Text(
+                                                  "Select Invoice Type",
+                                                  style: TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255,
+                                                        255,
+                                                        174,
+                                                        0), // Orangish Yellow
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                                content: const Text(
+                                                  "Please choose how you want to generate the invoice.",
+                                                  style: TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                actionsPadding:
+                                                    const EdgeInsets.only(
+                                                        bottom: 16,
+                                                        right: 16,
+                                                        left: 16),
+                                                actionsAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                actions: [
+                                                  ElevatedButton.icon(
+                                                    onPressed: () =>
+                                                        Navigator.pop(context,
+                                                            "Tax Invoice"),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              191,
+                                                              0), // Orangish Yellow
+                                                      foregroundColor:
+                                                          Colors.black,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 16,
+                                                          vertical: 12),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                    ),
+                                                    icon: const Icon(
+                                                      Icons.receipt,
+                                                      color: Colors.black,
+                                                    ),
+                                                    label: const Text(
+                                                      "Tax Invoice",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                  ElevatedButton.icon(
+                                                    onPressed: () =>
+                                                        Navigator.pop(context,
+                                                            "Delivery Note"),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              191,
+                                                              0), // Orangish Yellow
+                                                      foregroundColor:
+                                                          Colors.black,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 16,
+                                                          vertical: 12),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                    ),
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .local_shipping_outlined,
+                                                      color: Colors.black,
+                                                    ),
+                                                    label: const Text(
+                                                      "Delivery Note",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             );
-                                            await Provider.of<LpolistProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .fetchData();
+
+                                            if (selectedType != null) {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LpoinvoicePage(
+                                                          dataList:
+                                                              lpoListProvider
+                                                                  .details,
+                                                          header:
+                                                              lpoListProvider
+                                                                  .header.first,
+                                                          lpoNumber: widget
+                                                              .orderId
+                                                              .toString(),
+                                                          customerName: widget
+                                                              .customerName,
+                                                          invoiceType:
+                                                              selectedType),
+                                                ),
+                                              );
+                                              await Provider.of<
+                                                          LpolistProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .fetchData();
+                                            }
                                           } catch (e) {
                                             log("Error occurred: $e");
                                           }
+                                          // try {
+                                          // await Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         LpoinvoicePage(
+                                          //       dataList:
+                                          //           lpoListProvider.details,
+                                          //       header: lpoListProvider
+                                          //           .header.first,
+                                          //       lpoNumber:
+                                          //           widget.orderId.toString(),
+                                          //       customerName:
+                                          //           widget.customerName,
+                                          //     ),
+                                          //   ),
+                                          // );
+                                          // await Provider.of<LpolistProvider>(
+                                          //         context,
+                                          //         listen: false)
+                                          //     .fetchData();
+                                          // } catch (e) {
+                                          //   log("Error occurred: $e");
+                                          // }
                                         },
                                         child: Container(
                                           padding: EdgeInsets.symmetric(

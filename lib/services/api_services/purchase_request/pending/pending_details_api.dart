@@ -39,8 +39,9 @@ Future<BpoPendingDetailsModel> fetchPendingBPODetails({
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print('Response data: $data');
-      return BpoPendingDetailsModel.fromJson(data); // Assuming `fromJson` is implemented
+      log('venda Response data: $data');
+      return BpoPendingDetailsModel.fromJson(
+          data); // Assuming `fromJson` is implemented
     } else {
       throw Exception('Request failed with status: ${response.statusCode}');
     }

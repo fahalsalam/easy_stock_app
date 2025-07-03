@@ -161,7 +161,7 @@ class _MastersCustomerAddPageState extends State<MastersCustomerAddPage> {
                                 CustomTextfield(
                                   controller:
                                       customerManagement_provider.customerGroup,
-                                  txt: "Group",
+                                  txt: "Address",
                                   hintText: "",
                                   color: Colors.grey.shade900,
                                   suffixIcon: IconButton(
@@ -175,7 +175,24 @@ class _MastersCustomerAddPageState extends State<MastersCustomerAddPage> {
                                 CustomTextfield(
                                   controller:
                                       customerManagement_provider.customerCity,
-                                  txt: "City",
+                                  txt: "Trn No",
+                                  hintText: "",
+                                  color: Colors.grey.shade900,
+                                  suffixIcon: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                ),
+                                // const SizedBox(
+                                //   height: 25,
+                                // ),
+                                CustomTextfield(
+                                  controller:
+                                      customerManagement_provider.customerCity,
+                                  txt: "Mobile No",
                                   hintText: "",
                                   color: Colors.grey.shade900,
                                   suffixIcon: IconButton(
