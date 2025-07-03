@@ -4,6 +4,7 @@ import 'package:easy_stock_app/models/masters/item_model/item_model.dart';
 import 'package:easy_stock_app/models/purchase_order/lpoModel.dart';
 import 'package:easy_stock_app/models/purchase_order/order_details_model.dart';
 import 'package:easy_stock_app/services/api_services/masters/itemMaster_apis/itemmaster_get_api.dart';
+import 'package:easy_stock_app/services/api_services/purchase_order/cancel_order_api.dart';
 import 'package:easy_stock_app/services/api_services/purchase_order/edit_purchase_order_api.dart';
 import 'package:easy_stock_app/services/api_services/purchase_order/get_purchase_order_api.dart';
 import 'package:easy_stock_app/services/api_services/purchase_order/purchase_order_details_byid.dart';
@@ -15,41 +16,72 @@ class LpolistProvider with ChangeNotifier {
   String CustmrName = "";
   List<lpoDatum> lpoData = [];
   TextEditingController searchController = TextEditingController();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  bool _isChanged = false;
+  bool get isChanged => _isChanged;
+  List<Detail> _initialDetails = [];
+
+  void _setChanged() {
+    if (!_isChanged) {
+      _isChanged = true;
+      notifyListeners();
+    }
+  }
+
+  void resetChanged() {
+    _isChanged = false;
+    notifyListeners();
+  }
 
   // Fetch purchase order data
-  fetchData() async {
+  Future<void> fetchData() async {
+    if (_isLoading) return; // Prevent multiple simultaneous fetches
+
+    _isLoading = true;
+    notifyListeners();
+
     try {
+      log("fetching lpo data");
       var res = await getPurchaseorderApi();
+      log("res: $res");
+
       if (res != 'Failed') {
         Map<String, dynamic> jsonData = json.decode(res);
         PurchaseOrderLpoModel obj = PurchaseOrderLpoModel.fromJson(jsonData);
         print("lpo Length ${obj.data.length}");
         lpoData = obj.data;
-        notifyListeners();
       } else {
         lpoData = [];
-        notifyListeners();
-        return;
       }
     } catch (e) {
       log("Error fetching data: $e");
       lpoData = [];
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   List<Detail> details = [];
-  List<Header> header=[];
+  List<Header> header = [];
   String orderID = '0';
   String editNO = '0';
 
   // Fetch order details
-  fetchDetails({orderId, editNo}) async {
+  Future<void> fetchDetails(
+      {required String orderId, required String editNo}) async {
+    if (_isLoading) return;
+
+    _isLoading = true;
+    notifyListeners();
+
     try {
       log("order:$orderId");
       log("edit $editNo");
       var res = await getPurchaseorderDetailsByidApi(
           orderId: orderId, editNo: editNo);
+
       if (res != 'Failed') {
         Map<String, dynamic> jsonData = json.decode(res);
         OrderdetailsByidModel obj = OrderdetailsByidModel.fromJson(jsonData);
@@ -61,16 +93,19 @@ class LpolistProvider with ChangeNotifier {
         log("--------->>>>>edit id: $editNO");
         print("lpo Length ${obj.data.details.length}");
         details = obj.data.details;
-        header=obj.data.header;
-        notifyListeners();
+        _initialDetails = List.from(details); // Store initial state
+        header = obj.data.header;
+        resetChanged(); // Reset change tracking
       } else {
         details = [];
-        notifyListeners();
-        return;
+        header = [];
       }
     } catch (e) {
       log("Error fetching details: $e");
       details = [];
+      header = [];
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -137,6 +172,17 @@ class LpolistProvider with ChangeNotifier {
     return totalVat;
   }
 
+  cancelOrder(context) async {
+    var res = await cancelPurchaseOrderApi(editNo: editNO, orderID: orderID);
+    if (res != 'Failed') {
+      resetChanged(); // Reset change tracking after cancel
+      showSnackBar(context, "", "Order Cancelled", Colors.white);
+      Navigator.pop(context);
+    } else {
+      showSnackBar(context, "", "Error", Colors.red);
+    }
+  }
+
   // Confirm changes in the purchase order
   confirmFunction(
     List<Detail> productItemsList,
@@ -144,11 +190,39 @@ class LpolistProvider with ChangeNotifier {
   ) async {
     getPrice();
 
-    // Pass the transformed list to the API
+    // Get the latest edit number for this order
+    // int latestEditNo = 0;
+    // try {
+    //   // Find the latest edit number for this order ID
+    //   for (var item in lpoData) {
+    //     if (item.orderId == orderID) {
+    //       int currentEditNo = int.tryParse(item.editNo) ?? 0;
+    //       if (currentEditNo > latestEditNo) {
+    //         latestEditNo = currentEditNo;
+    //       }
+    //     }
+    //   }
+    //   // Increment the edit number
+    //   latestEditNo++;
+    //   editNO = latestEditNo.toString();
+    // } catch (e) {
+    //   log("Error calculating edit number: $e");
+    //   // If there's an error, increment the current edit number
+    //   editNO = (int.tryParse(editNO) ?? 0 + 1).toString();
+    // }
+
+    log("edit no: $editNO");
+    log("order id: $orderID");
+    log("customer id: $CustmrID");
+    log("customer name: $CustmrName");
+    log("total price: $totalPrice");
+    log("total vat: $totalVat");
+    log("product items list: $productItemsList");
+
     var res = await editPurchaseOrderApi(
       customerId: CustmrID,
       customername: CustmrName,
-      PurchaseOrderList: productItemsList, // Use transformedList here
+      PurchaseOrderList: productItemsList,
       totalPrice: totalPrice,
       Vat: totalVat,
       docStatus: 'U',
@@ -156,20 +230,19 @@ class LpolistProvider with ChangeNotifier {
       orderID: orderID,
     );
 
-    // Check the response from the API
     if (res != 'Failed') {
+      resetChanged(); // Reset change tracking after successful save
       showSnackBar(context, "", "Saved", Colors.white);
-      Navigator.pop(context);
-      // Handle success case
+      Navigator.pop(context, true); // Return true to trigger refresh
     } else {
       showSnackBar(context, "", "Error", Colors.red);
-      // Handle failure case
     }
   }
 
   // Delete an item from the list
   deleteIndex(index, context) {
     details.removeAt(index);
+    _setChanged();
     showSnackBar(context, "", "Item Removed", Colors.red);
     notifyListeners();
     getPrice();
@@ -177,9 +250,11 @@ class LpolistProvider with ChangeNotifier {
 
   // Change quantity of an item
   changeQty(index, value, context) {
-    details[index].qty = value;
-    notifyListeners();
-    //  showSnackBar(context, "", "Quantity Updated", Colors.white);
+    if (details[index].qty != value) {
+      details[index].qty = value;
+      _setChanged();
+      notifyListeners();
+    }
   }
 
   // add product button functions
@@ -296,18 +371,18 @@ class LpolistProvider with ChangeNotifier {
     } else {
       // Product does not exist, add it to the details list
       Detail newDetail = Detail(
-        productId: product.productId.toString(),
-        productName: product.productName,
-        qty: qty.toString(),
-        price: product.price.toString(),
-        total: (product.price * qty).toString(), // Calculate total based on qty
-        vat: product.vat.toString(),
-        unit: product.unit.toString(),
-        imageUrl: product.imageUrl,
-        unitID: product.unit,
-        uomCode: product.unitName,
-        itemStatus: ""
-      );
+          productId: product.productId.toString(),
+          productName: product.productName,
+          qty: qty.toString(),
+          price: product.price.toString(),
+          total:
+              (product.price * qty).toString(), // Calculate total based on qty
+          vat: product.vat.toString(),
+          unit: product.unit.toString(),
+          imageUrl: product.imageUrl,
+          unitID: product.unit,
+          uomCode: product.unitName,
+          itemStatus: "");
 
       details.add(newDetail);
       filteredItems = _filterOutDetails(itemData);

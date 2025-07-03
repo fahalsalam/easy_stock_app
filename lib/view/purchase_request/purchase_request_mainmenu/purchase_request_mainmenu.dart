@@ -37,23 +37,15 @@ class _RequestMainMenuState extends State<RequestMainMenu> {
       titleList = ["Vehicle Details"];
       colorList = [Colors.white];
       pages = [const VehicleListPage()];
+      imageicon = ['assets/icons/vehicle_icon.png'];
     } else {
-      titleList = [
-        "BPO",
-        "Pending",
-        "Completed",
-        "No Stock",
-        "Vehicle Details",
-        "PO",
-            "LPO"
-      ];
+      titleList = ["BPO", "Pending", "Completed", "No Stock", "PO", "LPO"];
 
       colorList = [
         Colors.white,
         Colors.white,
         Colors.green,
         Colors.red,
-        Colors.white,
         Colors.white,
         Colors.white,
       ];
@@ -63,7 +55,6 @@ class _RequestMainMenuState extends State<RequestMainMenu> {
         RequestPendingPage(),
         const RequestCompletdPage(),
         RequestNoStockPage(),
-        const VehicleListPage(),
         const PoPage(),
         const LpoListpage(),
       ];
@@ -72,7 +63,6 @@ class _RequestMainMenuState extends State<RequestMainMenu> {
         'assets/icons/pending_icon.png',
         'assets/icons/completed_icon.png',
         'assets/icons/nostock_icon.png',
-        'assets/icons/vehicle_icon.png',
         'assets/icons/po_icon.png',
         'assets/icons/lpo_icon.png',
       ];

@@ -44,20 +44,25 @@ const getPurchaseOrderbyProductRoute =
 const getPurchaseOrderRoute = '$baseUrl/api/6365/getPurchaseOrderListBPO';
 const getPurchaseUpdateRoute = '$baseUrl/api/6365/BPOOrderstatusUpdate';
 const getBPOvehiclesRoute = '$baseUrl/api/6365/getBPOByVehicles';
-const getProductSummaryRoute='$baseUrl/api/6365/getProductSummary';
+const getProductSummaryRoute = '$baseUrl/api/6365/getProductSummary';
 const getBPODetailsByVehicleIDRoute =
     '$baseUrl/api/6365/getBPODetailsByVehicleID';
 const getOrderDetailsByCustomerIDRoute =
     '$baseUrl/api/6365/getOrderDetailsByCustomerID';
-const getpendingRoute='$baseUrl/api/6365/getPendingBPO';
-const getpendingDetailsRoute='$baseUrl/api/6365/getPendingBPODetailsByID';
+const getpendingRoute = '$baseUrl/api/6365/getPendingBPO';
+const getpendingDetailsRoute = '$baseUrl/api/6365/getPendingBPODetailsByID';
 // history
- const getHistoryRoute = '$baseUrl/api/6365/getRequestHistory';
+const getHistoryRoute = '$baseUrl/api/6365/getRequestHistory';
 //  general settings
-const postvalidityRoute='$baseUrl/api/6364/postGeneralSettings';
-const getvalidityRoute='$baseUrl/api/6364/getGeneralSettings';
+const postvalidityRoute = '$baseUrl/api/6364/postGeneralSettings';
+const getvalidityRoute = '$baseUrl/api/6364/getGeneralSettings';
 // po
 const getPoRoute = '$baseUrl/api/6365/getPurchaseOrderListbySingleRow';
+// edit order
+const orderCancelRoute = '$baseUrl/api/6365/OrderCancel';
+// orderid
+// edit no
+// header
 Future<String?> getToken() async {
   TokenManager tokenObj = TokenManager();
   var _accessToken = await tokenObj.getAccessToken();

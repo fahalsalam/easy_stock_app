@@ -16,21 +16,42 @@ class Productsummarypage extends StatefulWidget {
 }
 
 class _ProductsummarypageState extends State<Productsummarypage> {
-  bool isLoading =true;
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<BpoVehicleProvider>(context, listen: false)
-          .fetchProductSummary(widget.id).then((_){
-            isLoading=false;
-          });
+          .fetchProductSummary(widget.id)
+          .then((_) {
+        setState(() {
+          isLoading = false;
+        });
+      });
     });
+  }
+
+  Map<String, List<ProductSummaryDatum>> _groupProducts(
+      List<ProductSummaryDatum> products) {
+    Map<String, List<ProductSummaryDatum>> groupedProducts = {};
+    for (var product in products) {
+      if (!groupedProducts.containsKey(product.productName)) {
+        groupedProducts[product.productName] = [];
+      }
+      groupedProducts[product.productName]!.add(product);
+    }
+    return groupedProducts;
+  }
+
+  double _calculateTotalQuantity(List<ProductSummaryDatum> products) {
+    return products.fold(
+        0, (sum, product) => sum + double.parse(product.totalQty));
   }
 
   @override
   Widget build(BuildContext context) {
-  final bpoVehicleProvider = Provider.of<BpoVehicleProvider>(context);
+    final bpoVehicleProvider = Provider.of<BpoVehicleProvider>(context);
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
@@ -38,147 +59,295 @@ class _ProductsummarypageState extends State<Productsummarypage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-            child: Column(
-              children: [
-                SizedBox(height: screenHeight * 0.053),
-                CustomAppBar(txt: "Vehicle Details"),
-                SizedBox(height: screenHeight * 0.05),
-                Center(
-                  child: Container(
-                    width: screenWidth * 0.9,
+          Positioned(
+            top: screenHeight * 0.06,
+            left: screenWidth * 0.02,
+            right: screenWidth * 0.02,
+            child: CustomAppBar(txt: "Product Summary"),
+          ),
+          Positioned(
+            top: screenHeight * 0.13,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24, width: 1),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                      isLoading?SizedBox(
-                        height: screenHeight*0.5,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.inventory_2_outlined,
+                            color: primaryColor,
+                            size: 18,
                           ),
                         ),
-                      ):
-                        bpoVehicleProvider.vehicleData.isEmpty
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Text(
-                                    "No Data",
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Product distribution across customers",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white24, width: 1),
+                      ),
+                      child: isLoading
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(
+                                    color: primaryColor,
+                                    strokeWidth: 2,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    "Loading products...",
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontSize: 13,
                                     ),
                                   ),
-                                ),
-                              )
-                            : ListView.builder(
-                                padding: const EdgeInsets.only(
-                                    top: 10, left: 10, right: 10, bottom: 15),
-                                itemCount:
-                                    bpoVehicleProvider.productData.length,
-                                shrinkWrap: true,
-                                // physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                               ProductSummaryDatum data =
-                                      bpoVehicleProvider.productData[index];
-                                  return Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: Container(
-                                      height: screenHeight * 0.085,
-                                      width: screenWidth * 0.8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(10),
+                                ],
+                              ),
+                            )
+                          : bpoVehicleProvider.productData.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.inventory_2_outlined,
+                                        size: 48,
+                                        color: Colors.white.withOpacity(0.5),
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        "No Products Found",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.all(12),
+                                  itemCount: _groupProducts(
+                                          bpoVehicleProvider.productData)
+                                      .length,
+                                  itemBuilder: (context, index) {
+                                    final groupedProducts = _groupProducts(
+                                        bpoVehicleProvider.productData);
+                                    final productName =
+                                        groupedProducts.keys.elementAt(index);
+                                    final products =
+                                        groupedProducts[productName]!;
+                                    final totalQuantity =
+                                        _calculateTotalQuantity(products);
+
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: Colors.white24,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            SizedBox(
-                                                width: screenWidth * 0.03),
-                                           
-                                            CircleAvatar(
-                                              radius: 18,
-                                              backgroundColor: primaryColor,
-                                              child: Text(
-                                                data.productName.isEmpty
-                                                    ? 'P'
-                                                    : data.productName[0]
-                                                        .toUpperCase(),
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black,
+                                            // Product Header
+                                            Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  topLeft: Radius.circular(12),
+                                                  topRight: Radius.circular(12),
                                                 ),
                                               ),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    height: 40,
+                                                    width: 40,
+                                                    decoration: BoxDecoration(
+                                                      color: primaryColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        productName.isEmpty
+                                                            ? 'P'
+                                                            : productName[0]
+                                                                .toUpperCase(),
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          productName,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Colors.white,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        Text(
+                                                          "Total Quantity: ${totalQuantity.toStringAsFixed(2)}",
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: primaryColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            SizedBox(
-                                                width: screenWidth * 0.03),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: screenWidth * 0.5,
-                                             
-                                                  child: Text(
-                                                    //  'fsdbmbsdsbnfsafvdfnsadsfdbvsda',
-                                                      data.productName,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),SizedBox(
-                                                  width: screenWidth * 0.5,
-                                                  child: Text(
-                                                   'Customer Name: ${data.customerName}',
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Colors.white,
+                                            // Customer List
+                                            ListView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              itemCount: products.length,
+                                              itemBuilder:
+                                                  (context, customerIndex) {
+                                                final product =
+                                                    products[customerIndex];
+                                                return Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    border: Border(
+                                                      bottom: BorderSide(
+                                                        color: Colors.white24,
+                                                        width: customerIndex ==
+                                                                products.length -
+                                                                    1
+                                                            ? 0
+                                                            : 1,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  "Total Qty: ${double.parse(data.totalQty).toStringAsFixed(2)}",
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w400,
-                                                    color: Colors.white,
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          product.customerName,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 13,
+                                                            color:
+                                                                Colors.white70,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: primaryColor
+                                                              .withOpacity(0.2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                        child: Text(
+                                                          "Qty: ${double.parse(product.totalQty).toStringAsFixed(2)}",
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: primaryColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                        SizedBox(height: screenHeight * 0.03),
-                      ],
+                                    );
+                                  },
+                                ),
                     ),
                   ),
-                ),
-                SizedBox(height: screenHeight * 0.03),
-              ],
+                ],
+              ),
             ),
           ),
         ],

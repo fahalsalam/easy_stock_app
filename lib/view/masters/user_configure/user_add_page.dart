@@ -28,31 +28,39 @@ class _UserMasterAddPageState extends State<UserMasterAddPage> {
     var screenWidth = MediaQuery.of(context).size.width;
 
     final userconfigure_provider = Provider.of<UserConfigureProvider>(context);
-    return Scaffold(
-      body: Stack(
-        children: [
-          BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "Add User"),
-          ),
-          Padding(
-            padding:
-                EdgeInsets.only(top: screenHeight * 0.142, left: 15, right: 15),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Visibility(
-                      visible: userconfigure_provider.selectedIndex == 0,
-                      child: const AddUserWidget()),
-                ],
+    return WillPopScope(
+      onWillPop: () async {
+        // Refresh the user list when going back
+        await Provider.of<UserConfigureProvider>(context, listen: false)
+            .fetchData();
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            BackgroundImageWidget(image: common_backgroundImage),
+            Positioned(
+              top: screenHeight * 0.06,
+              left: screenWidth * 0.02,
+              right: screenWidth * 0.02,
+              child: CustomAppBar(txt: "Add User"),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: screenHeight * 0.142, left: 15, right: 15),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Visibility(
+                        visible: userconfigure_provider.selectedIndex == 0,
+                        child: const AddUserWidget()),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,10 +1,10 @@
 import 'package:easy_stock_app/utils/constants/colors/colors.dart';
 import 'package:easy_stock_app/utils/constants/images/images.dart';
+import 'package:easy_stock_app/view/splash_screens/get_started_page/get_started_page.dart';
 import 'package:easy_stock_app/view/splash_screens/welcome_screens/wecome_screen_widgets/button_widget.dart';
 import 'package:easy_stock_app/view/splash_screens/welcome_screens/welcome_screen2/welcome_screen2.dart';
 import 'package:flutter/material.dart';
 import '../../../../utils/constants/fontStyle/fontstyle.dart';
-
 
 class WelcomeScreen1 extends StatelessWidget {
   const WelcomeScreen1({super.key});
@@ -38,7 +38,7 @@ class WelcomeScreen1 extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                     width: screenWidth * 0.154,
+                    width: screenWidth * 0.154,
                   ),
                   SizedBox(
                     height: screenHeight * 0.1,
@@ -51,11 +51,11 @@ class WelcomeScreen1 extends StatelessWidget {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const GetStartedPage()),
-                      // );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const GetStartedPage()),
+                      );
                     },
                     child: Text("Skip", style: poppins16W500),
                   )

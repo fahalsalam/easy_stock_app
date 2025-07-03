@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 import 'package:easy_stock_app/controllers/providers/purchase_providers/lpoList_providers/lpoList_provider.dart';
 import 'package:easy_stock_app/models/purchase_order/order_details_model.dart';
@@ -14,11 +16,12 @@ class LpoOrderListpage extends StatefulWidget {
   final String orderId;
   final String editNo;
   final String customerName;
-  const LpoOrderListpage(
-      {super.key,
-      required this.orderId,
-      required this.editNo,
-      required this.customerName});
+  const LpoOrderListpage({
+    super.key,
+    required this.orderId,
+    required this.editNo,
+    required this.customerName,
+  });
 
   @override
   State<LpoOrderListpage> createState() => _LpoOrderListpageState();
@@ -26,6 +29,7 @@ class LpoOrderListpage extends StatefulWidget {
 
 class _LpoOrderListpageState extends State<LpoOrderListpage> {
   bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,7 +38,9 @@ class _LpoOrderListpageState extends State<LpoOrderListpage> {
       Provider.of<LpolistProvider>(context, listen: false)
           .fetchDetails(orderId: widget.orderId, editNo: widget.editNo)
           .then((_) {
-        isLoading = false;
+        setState(() {
+          isLoading = false;
+        });
       });
     });
   }
@@ -49,133 +55,165 @@ class _LpoOrderListpageState extends State<LpoOrderListpage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "View Order"),
-          ),
-          Positioned(
-            top: screenHeight * 0.14,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          "Order List",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ), 
-                        const Spacer(),
-                        Visibility(
-                          visible: !isLoading,
-                          child: Material(
-                            elevation: 3,
-                            borderRadius: BorderRadius.circular(10),
-                            child: GestureDetector(
-                              onTap: () async {
-                                try {
-                                  // Push to the EditOrderListPage
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => 
-                                        // |Lpoinvoicepage()
-                                        // PdfPrintScreen()
-                                         LpoinvoicePage(
-                                          dataList: lpoListProvider.details,
-                                          header:lpoListProvider.header.first,
-                                          lpoNumber: widget.orderId.toString(),
-                                          customerName: widget.customerName,
-                                        ),
-                                        ),
-                                  );
-
-                                  // After returning from EditOrderListPage, fetch new data
-                                  await Provider.of<LpolistProvider>(context,
-                                          listen: false)
-                                      .fetchData();
-                                } catch (e) {
-                                  // Handle any errors that occur during navigation or data fetching
-                                  log("Error occurred: $e");
-                                  // Optionally show a flushbar or dialog to notify the user
-                                }
-                              },
-                              child: Container(
-                                height: screenHeight * 0.035,
-                                width: screenWidth * 0.2,
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border:
-                                      Border.all(width: 1, color: primaryColor),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    "Invoice",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    // const Text(
-                    //   "Order List",
-                    //   style: TextStyle(
-                    //     fontWeight: FontWeight.w700,
-                    //     fontSize: 16,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
-                    SizedBox(height: screenHeight * 0.01),
-                    const Text(
-                      "Note: Browse our wide selection of fresh vegetables and fruits on the cart page.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    isLoading
-                        ? const SizedBox(
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
-                        : _buildOrderList(context, lpoListProvider,
-                            screenHeight, screenWidth),
-                    //  SizedBox(height: screenHeight * 0.02),
-
-                    SizedBox(height: screenHeight * 0.08),
-                    Visibility(
-                      visible: !isLoading,
-                      child: _buildSummary(
-                          context, lpoListProvider, screenWidth, screenHeight),
-                    ),
-                    // _buildActionButtons(
-                    //     context, lpoListProvider, screenHeight, screenWidth),
-                    SizedBox(height: screenHeight * 0.23),
-                  ],
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                  child: CustomAppBar(txt: "LPO No: ${widget.orderId}"),
                 ),
-              ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(screenWidth * 0.04,
+                            screenHeight * 0.01, screenWidth * 0.04, 0),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.03,
+                                  vertical: screenHeight * 0.015),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(10),
+                                border:
+                                    Border.all(color: Colors.white24, width: 1),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.shopping_cart_outlined,
+                                      color: primaryColor,
+                                      size: screenWidth * 0.05),
+                                  SizedBox(width: screenWidth * 0.03),
+                                  Text(
+                                    "Order List",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: screenWidth * 0.04,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (!isLoading)
+                                    Material(
+                                      elevation: 2,
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(8),
+                                        onTap: () async {
+                                          try {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LpoinvoicePage(
+                                                  dataList:
+                                                      lpoListProvider.details,
+                                                  header: lpoListProvider
+                                                      .header.first,
+                                                  lpoNumber:
+                                                      widget.orderId.toString(),
+                                                  customerName:
+                                                      widget.customerName,
+                                                ),
+                                              ),
+                                            );
+                                            await Provider.of<LpolistProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .fetchData();
+                                          } catch (e) {
+                                            log("Error occurred: $e");
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: screenWidth * 0.03,
+                                              vertical: screenHeight * 0.008),
+                                          decoration: BoxDecoration(
+                                            color: primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.receipt_long,
+                                                  color: Colors.black,
+                                                  size: screenWidth * 0.035),
+                                              SizedBox(
+                                                  width: screenWidth * 0.015),
+                                              Text(
+                                                "Invoice",
+                                                style: TextStyle(
+                                                  fontSize: screenWidth * 0.03,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      Expanded(
+                        child: isLoading
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const CircularProgressIndicator(
+                                      color: primaryColor,
+                                      strokeWidth: 2.5,
+                                    ),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text(
+                                      "Loading order details...",
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                        fontSize: screenWidth * 0.03,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04),
+                                child: _buildOrderList(context, lpoListProvider,
+                                    screenHeight, screenWidth),
+                              ),
+                      ),
+                      if (!isLoading)
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.04,
+                              vertical: screenHeight * 0.015),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.04,
+                              vertical: screenHeight * 0.01),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white24, width: 1),
+                          ),
+                          child: _buildSummary(context, lpoListProvider,
+                              screenWidth, screenHeight),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -185,297 +223,208 @@ class _LpoOrderListpageState extends State<LpoOrderListpage> {
 
   Widget _buildOrderList(BuildContext context, LpolistProvider provider,
       double screenHeight, double screenWidth) {
-    return Container(
-      // color: Colors.red,
-
-      height: screenHeight * 0.55,
-      child: provider.details.isEmpty
-          ? const Center(
-              child: Text(
-                "No Product data",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.only(bottom: 50),
-              itemCount: provider.details.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                final item = provider.details[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _buildOrderItem(item, index, context, provider,
-                      screenHeight, screenWidth),
-                );
-              },
-            ),
-    );
-  }
-
-  Widget _buildOrderItem(Detail item, int index, BuildContext context,
-      LpolistProvider provider, double screenHeight, double screenWidth) {
-    return Visibility(
-      visible: item.itemStatus != 'NoStock',
-      child: Container(
-        height: screenHeight * 0.12,
-        width: screenWidth * 0.06,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.grey.withOpacity(0.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    if (provider.details.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
-                child: Container(
-              height: screenHeight * 0.07,
-              width: screenWidth * 0.18,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
+            Icon(
+              Icons.shopping_cart_outlined,
+              size: screenWidth * 0.1,
+              color: Colors.white.withOpacity(0.5),
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            Text(
+              "No Products Found",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.w500,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
-                child: Image.network(
-                  item.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.image, size: 40, color: Colors.white),
-                ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.only(
+          top: screenHeight * 0.01, bottom: screenHeight * 0.02),
+      itemCount: provider.details.length,
+      itemBuilder: (context, index) {
+        final item = provider.details[index];
+        return Visibility(
+          visible: item.itemStatus != 'NoStock',
+          child: Padding(
+            padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white24, width: 1),
               ),
-            )),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // SizedBox(height: 0.05,),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                  width: screenWidth * 0.48,
-                  child: Text(
-                    item.productName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
+              child: Padding(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      "Uom: ${item.uomCode}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 14,
+                    Container(
+                      height: screenWidth * 0.12,
+                      width: screenWidth * 0.12,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white24, width: 1),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          item.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.image,
+                            size: screenWidth * 0.06,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.03),
-                    Text(
-                      "Qty: ${double.parse(item.qty).toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 14,
+                    SizedBox(width: screenWidth * 0.025),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.productName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontSize: screenWidth * 0.033,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: screenHeight * 0.006),
+                          Row(
+                            children: [
+                              _buildTag(
+                                context,
+                                'UOM: ${item.uomCode}',
+                                screenWidth,
+                                screenHeight,
+                                Colors.white.withOpacity(0.1),
+                                Colors.white70,
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
+                              _buildTag(
+                                context,
+                                'Qty: ${double.parse(item.qty).toStringAsFixed(2)}',
+                                screenWidth,
+                                screenHeight,
+                                primaryColor.withOpacity(0.2),
+                                primaryColor,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.005),
+                          _buildTag(
+                            context,
+                            '${double.parse(item.price).toStringAsFixed(2)} AED',
+                            screenWidth,
+                            screenHeight,
+                            Colors.white.withOpacity(0.1),
+                            Colors.white,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                Text(
-                  "${double.parse(item.price).toStringAsFixed(2)} AED",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
-                ),
-                // Text(
-                //   "${item.itemStatus}",
-                //   style: const TextStyle(
-                //     fontWeight: FontWeight.w400,
-                //     color: Colors.white,
-                //     fontSize: 14,
-                //   ),
-                // ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _editQuantity(
-      BuildContext context, int index, LpolistProvider provider) async {
-    TextEditingController quantityController =
-        TextEditingController(text: provider.details[index].qty.toString());
-    String? result = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey.withOpacity(0.5),
-          content: TextField(
-            controller: quantityController,
-            cursorColor: primaryColor,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: 'Enter new quantity',
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: primaryColor, width: 2.0),
-                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
           ),
-          actions: [
-            TextButton(
-              child:
-                  const Text('Cancel', style: TextStyle(color: primaryColor)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Save', style: TextStyle(color: primaryColor)),
-              onPressed: () {
-                Navigator.of(context).pop(quantityController.text);
-              },
-            ),
-          ],
         );
       },
     );
+  }
 
-    if (result != null && result.isNotEmpty) {
-      setState(() {
-        provider.details[index].qty = result;
-      });
-    }
+  Widget _buildTag(BuildContext context, String text, double screenWidth,
+      double screenHeight, Color bgColor, Color textColor) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.015, vertical: screenHeight * 0.003),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: screenWidth * 0.028,
+          fontWeight: FontWeight.w500,
+          color: textColor,
+        ),
+      ),
+    );
   }
 
   Widget _buildSummary(BuildContext context, LpolistProvider provider,
-      double screenWidth, screenHeight) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-      child: Column(
-        children: [
-          _buildSummaryRow("Total Items", provider.details.length.toString()),
-          SizedBox(height: screenHeight * 0.003),
-          _buildSummaryRow("Total Quantity", provider.getTotalQuantity()),
-          SizedBox(height: screenHeight * 0.003),
-          _buildSummaryRow("Grand Total", provider.getPrice()),
-          // _buildSummaryRow("Grand Total", "2700.00"),
-        ],
-      ),
+      double screenWidth, double screenHeight) {
+    return Column(
+      children: [
+        _buildSummaryRow(
+          "Total Items",
+          provider.details.length.toString(),
+          Icons.inventory_2_outlined,
+          screenWidth,
+          screenHeight,
+        ),
+        Divider(color: Colors.white24, height: screenHeight * 0.025),
+        _buildSummaryRow(
+          "Total Quantity",
+          provider.getTotalQuantity(),
+          Icons.shopping_cart_outlined,
+          screenWidth,
+          screenHeight,
+        ),
+        Divider(color: Colors.white24, height: screenHeight * 0.025),
+        _buildSummaryRow(
+          "Grand Total",
+          provider.getPrice(),
+          Icons.payments_outlined,
+          screenWidth,
+          screenHeight,
+          isTotal: true,
+        ),
+      ],
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(String label, String value, IconData icon,
+      double screenWidth, double screenHeight,
+      {bool isTotal = false}) {
     return Row(
       children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              fontSize: 15,
-            ),
+        Icon(icon,
+            color: isTotal ? primaryColor : Colors.white70,
+            size: screenWidth * 0.045),
+        SizedBox(width: screenWidth * 0.03),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isTotal ? primaryColor : Colors.white,
+            fontSize: screenWidth * 0.035,
           ),
         ),
-        const Text(" : "),
+        const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: Colors.white,
-            fontSize: 14,
+            color: isTotal ? primaryColor : Colors.white,
+            fontSize: screenWidth * 0.035,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context, LpolistProvider provider,
-      double screenHeight, double screenWidth) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildButton(context, "Cancel", Colors.black, () {
-          yesnoAlertDialog(
-            context: context,
-            message: "Do you want to Cancel?",
-            screenHeight: screenHeight,
-            screenWidth: screenWidth,
-            onNo: () {
-              Navigator.pop(context);
-            },
-            onYes: () {
-              // provider.confirmFunction(provider.details, context);
-              Navigator.pop(context);
-            },
-            buttonNoText: "No",
-            buttonYesText: "Yes",
-          );
-        }, screenHeight, screenWidth),
-        _buildButton(context, "Confirm", primaryColor, () {
-          yesnoAlertDialog(
-            context: context,
-            message: "Do you want to Confirm?",
-            screenHeight: screenHeight,
-            screenWidth: screenWidth,
-            onNo: () {
-              Navigator.pop(context);
-            },
-            onYes: () {
-              provider.confirmFunction(provider.details, context);
-              Navigator.pop(context);
-            },
-            buttonNoText: "No",
-            buttonYesText: "Yes",
-          );
-        }, screenHeight, screenWidth),
-      ],
-    );
-  }
-
-  Widget _buildButton(BuildContext context, String text, Color color,
-      VoidCallback onPressed, double screenHeight, double screenWidth) {
-    return Material(
-      elevation: 3,
-      borderRadius: BorderRadius.circular(10),
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          height: screenHeight * 0.045,
-          width: screenWidth * 0.38,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(width: 1, color: primaryColor),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: color == Colors.black ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

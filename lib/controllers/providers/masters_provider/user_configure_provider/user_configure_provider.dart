@@ -15,8 +15,8 @@ class UserConfigureProvider with ChangeNotifier {
   bool get isshowPassword => _isshowPassword;
   String customerName = "";
   String customerID = "";
-  bool _isLoading=false;
-  get isLoading =>_isLoading;
+  bool _isLoading = false;
+  get isLoading => _isLoading;
   TextEditingController userCodeController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
   TextEditingController userPasswordController = TextEditingController();
@@ -24,25 +24,26 @@ class UserConfigureProvider with ChangeNotifier {
     _isConfirmPassword = !_isConfirmPassword;
     notifyListeners();
   }
-  
-addCustomer(String id,String name){
-customerID=id;
-customerName=name;
-notifyListeners();
-}
 
-setLoading(bool value){
-  _isLoading=value;
-  notifyListeners();
-}
+  addCustomer(String id, String name) {
+    customerID = id;
+    customerName = name;
+    notifyListeners();
+  }
 
-removeData(){
-userCodeController.clear();
-userNameController.clear();
-userPasswordController.clear();
-customerID = "";
-customerName = "";
-}
+  setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  removeData() {
+    userCodeController.clear();
+    userNameController.clear();
+    userPasswordController.clear();
+    customerID = "";
+    customerName = "";
+  }
+
   void togglePasswordVisibility() {
     _isshowPassword = !_isshowPassword;
     notifyListeners();
@@ -79,10 +80,12 @@ customerName = "";
     _isRequest = !_isRequest;
     notifyListeners();
   }
-void toggleDriver() {
+
+  void toggleDriver() {
     _isDriver = !_isDriver;
     notifyListeners();
   }
+
   List<User> userData = [];
   List<UserCategory> userCategory = [];
   fetchData() async {
@@ -92,7 +95,7 @@ void toggleDriver() {
       UserMasterModel obj = UserMasterModel.fromJson(jsonData);
       print(" Length ${obj.data.users.length}");
       userData = obj.data.users;
-      userCategory=obj.data.userCategory;
+      userCategory = obj.data.userCategory;
       notifyListeners();
     } else {
       userData = [];
@@ -101,11 +104,17 @@ void toggleDriver() {
     }
   }
 
-  userSave(context)  {
-  setLoading(true);
+  userSave(context) {
+    setLoading(true);
     print("-------------->>>>");
+    if (isDriver) {
+      if (selectedVehicleIds == '') {
+        showSnackBar(context, "Please select a vehicle", "Error", Colors.red);
+        return;
+      }
+    }
     // Future.delayed(Duration(seconds: 2));
-   
+
     var res = postUserMaster(
         userCode: userCodeController.text,
         userName: userNameController.text,
@@ -114,37 +123,40 @@ void toggleDriver() {
         isPurchase: isMasters,
         isMasters: isPurchase,
         isConsolidate: isRequest,
-        isDriver:isDriver ,category: selectedcategoryIds
-        );
+        isDriver: isDriver,
+        category: selectedcategoryIds,
+        vehicleID: selectedVehicleIds);
+
     if (res != 'Failed') {
       clearAll();
       showSnackBar(
-            context, "User added successfully", "User Added", Colors.white);
-        Navigator.pop(context);
+          context, "User added successfully", "User Added", Colors.white);
+      Navigator.pop(context);
       print("post done");
     } else {
-       showSnackBar(
-            context, "Please try again!", "Error", Colors.red);
-        Navigator.pop(context);
+      showSnackBar(context, "Please try again!", "Error", Colors.red);
+      Navigator.pop(context);
       print("post Failed");
     }
     setLoading(false);
   }
- clearAll(){
-  userCodeController.clear();
-  userNameController.clear();
-  userPasswordController.clear();
-  customerID="";
-  _isMasters=false;
-  _isPurchase=false;
-  _isRequest=false;
-  notifyListeners();
- }// category
-List<Map<String, dynamic>> categoryList = [];
-TextEditingController categoryController=TextEditingController();
+
+  clearAll() {
+    userCodeController.clear();
+    userNameController.clear();
+    userPasswordController.clear();
+    customerID = "";
+    _isMasters = false;
+    _isPurchase = false;
+    _isRequest = false;
+    notifyListeners();
+  } // category
+
+  List<Map<String, dynamic>> categoryList = [];
+  TextEditingController categoryController = TextEditingController();
   String errorMessage = '';
-String categoryID="";
-String categoryName="";
+  String categoryID = "";
+  String categoryName = "";
   // Fetch the categories from the API
   Future<void> fetchCategory() async {
     // isLoading = true;
@@ -160,11 +172,11 @@ String categoryName="";
         if (jsonData['data'] != null) {
           // CategoryListModel obj = CategoryListModel.fromJson(jsonData);
           categoryList = (jsonData['data'] as List)
-          .map<Map<String, dynamic>>((item) => {
-                'id': item['CategoryID'].toString(),
-                'name': item['CategoryName'].toString(),
-              })
-          .toList();
+              .map<Map<String, dynamic>>((item) => {
+                    'id': item['CategoryID'].toString(),
+                    'name': item['CategoryName'].toString(),
+                  })
+              .toList();
         } else {
           categoryList = [];
           errorMessage = 'No categories available';
@@ -182,9 +194,18 @@ String categoryName="";
       notifyListeners();
     }
   }
-List<String> selectedcategoryIds=[];
-  selectedCategories(List<String> selecedCategory){
-selectedcategoryIds=selecedCategory;
-notifyListeners();
+
+  List<String> selectedcategoryIds = [];
+  selectedCategories(List<String> selecedCategory) {
+    selectedcategoryIds = selecedCategory;
+    notifyListeners();
+  }
+
+  String _selectedVehicleIds = '';
+  String get selectedVehicleIds => _selectedVehicleIds;
+
+  void selectedVehicles(String vehicleIds) {
+    _selectedVehicleIds = vehicleIds;
+    notifyListeners();
   }
 }

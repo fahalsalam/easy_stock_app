@@ -1,4 +1,3 @@
-
 import 'package:easy_stock_app/utils/constants/images/images.dart';
 import 'package:easy_stock_app/view/splash_screens/get_started_page/get_started_page.dart';
 import 'package:easy_stock_app/view/splash_screens/welcome_screens/wecome_screen_widgets/button_widget.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../utils/constants/colors/colors.dart';
 import '../../../../utils/constants/fontStyle/fontstyle.dart';
-
 
 class WelcomeScreen2 extends StatelessWidget {
   const WelcomeScreen2({super.key});
@@ -53,12 +51,12 @@ class WelcomeScreen2 extends StatelessWidget {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
-                  //     Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => const GetStartedPage()),
-                  // );
-                  },
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const GetStartedPage()),
+                      );
+                    },
                     child: Text("Skip", style: poppins16W500),
                   )
                 ],

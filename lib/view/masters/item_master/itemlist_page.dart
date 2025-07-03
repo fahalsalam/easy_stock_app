@@ -1,4 +1,3 @@
-
 import 'package:easy_stock_app/controllers/providers/masters_provider/item_master_provider/item_master_provider.dart';
 import 'package:easy_stock_app/utils/common_widgets/background_image_widget.dart';
 import 'package:easy_stock_app/utils/common_widgets/custom_appbar.dart';
@@ -18,11 +17,18 @@ class MastersProductListPage extends StatefulWidget {
 }
 
 class _MastersProductListPageState extends State<MastersProductListPage> {
+  bool _isLoading = true;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ItemMasterProvider>(context, listen: false).fetchData();
+      Provider.of<ItemMasterProvider>(context, listen: false)
+          .fetchData()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     });
   }
 
@@ -56,181 +62,202 @@ class _MastersProductListPageState extends State<MastersProductListPage> {
                 builder: (context, provider, child) {
               return SizedBox(
                 height: screenHeight * 0.75,
-                child: itemmasterProvider.items.isEmpty
+                child: _isLoading
                     ? const Center(
-                        child: Text(
-                          "No products",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
                         ),
                       )
-                    : ListView.builder(
-                        padding: EdgeInsets.only(bottom: screenHeight * 0.15),
-                        shrinkWrap: true,
-                        itemCount: itemmasterProvider.items.length,
-                        itemBuilder: (context, index) {
-                          final product = itemmasterProvider.items[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Container(
-                              height: screenHeight *
-                                  0.15, // Adjust height to fit 2-line display
-                              width: screenWidth * 0.3,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(15),
+                    : itemmasterProvider.items.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "No products",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 15),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      width: screenWidth * 0.02,
-                                    ),
-                                    // Image Container
-                                    Center(
-                                      child: Container(
-                                        height: screenHeight *
-                                            0.075, // Adjust image height
-                                        width: screenWidth *
-                                            0.2, // Adjust image width
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                              12), // Rounded corners
-                                          // You can adjust the border radius value to make the corners more or less rounded
+                            ),
+                          )
+                        : ListView.builder(
+                            padding:
+                                EdgeInsets.only(bottom: screenHeight * 0.15),
+                            shrinkWrap: true,
+                            itemCount: itemmasterProvider.items.length,
+                            itemBuilder: (context, index) {
+                              final product = itemmasterProvider.items[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Container(
+                                  height: screenHeight *
+                                      0.15, // Adjust height to fit 2-line display
+                                  width: screenWidth * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 15),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: screenWidth * 0.02,
                                         ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                              12), // Apply rounded corners to the image as well
-                                          child: Image.network(
-                                            product.imageUrl,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
+                                        // Image Container
+                                        Center(
+                                          child: Container(
+                                            height: screenHeight *
+                                                0.075, // Adjust image height
+                                            width: screenWidth *
+                                                0.2, // Adjust image width
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      12), // Rounded corners
+                                              // You can adjust the border radius value to make the corners more or less rounded
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Apply rounded corners to the image as well
+                                              child: Image.network(
+                                                product.imageUrl,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
                                                     const Icon(
-                                              Icons.panorama,
-                                              size: 45,
-                                              color: Color.fromARGB(
-                                                  255, 97, 92, 74),
+                                                  Icons.panorama,
+                                                  size: 45,
+                                                  color: Color.fromARGB(
+                                                      255, 97, 92, 74),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: screenWidth * 0.05,
-                                    ),
+                                        SizedBox(
+                                          width: screenWidth * 0.05,
+                                        ),
 
-                                    // Text Column with 2-line layout
-                                    SizedBox(
-                                      height: screenHeight * 0.2,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // First Line: Product Name and Edit Icon
-                                          Row(
-                                            children: [
-                                              // Product name
-                                              SizedBox(
-                                                width: screenWidth * 0.5,
-                                                child: Text(
-                                                  product.productName,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  overflow: TextOverflow
-                                                      .ellipsis, // Handle long text
-                                                ),
-                                              ),
-                                             
-                                              // Edit icon
-                                              IconButton(
-                                                onPressed: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ItemMasterEditItemPage(
-                                                              product: product),
-                                                    ),
-                                                  ).then((_) {
-                                                    WidgetsBinding.instance
-                                                        .addPostFrameCallback(
-                                                            (_) {
-                                                      Provider.of<ItemMasterProvider>(
-                                                              context,
-                                                              listen: false)
-                                                          .fetchData();
-                                                    });
-                                                  });
-                                                },
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.white,
-                                                  size: 20,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-
-                                          // Second Line: Product Details (Price, UOM, Barcode)
-                                          Column(
+                                        // Text Column with 2-line layout
+                                        SizedBox(
+                                          height: screenHeight * 0.2,
+                                          child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Padding(
-                                                padding: const EdgeInsets.all(2.0),
-                                                child: Text(
-                                                  "Price: ${(product.price).toStringAsFixed(2)} AED",
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
+                                              // First Line: Product Name and Edit Icon
+                                              Row(
+                                                children: [
+                                                  // Product name
+                                                  SizedBox(
+                                                    width: screenWidth * 0.5,
+                                                    child: Text(
+                                                      product.productName,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                      overflow: TextOverflow
+                                                          .ellipsis, // Handle long text
+                                                    ),
                                                   ),
-                                                ),
+
+                                                  // Edit icon
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ItemMasterEditItemPage(
+                                                                  product:
+                                                                      product),
+                                                        ),
+                                                      ).then((_) {
+                                                        WidgetsBinding.instance
+                                                            .addPostFrameCallback(
+                                                                (_) {
+                                                          Provider.of<ItemMasterProvider>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .fetchData();
+                                                        });
+                                                      });
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.edit,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(2.0),
-                                                child: Text(
-                                                  "UOM: ${product.unitName}",
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
+
+                                              // Second Line: Product Details (Price, UOM, Barcode)
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Text(
+                                                      "Price: ${(product.price).toStringAsFixed(2)} AED",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(2.0),
-                                                child: Text(
-                                                  "Category: ${product.categoryName}",
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Text(
+                                                      "UOM: ${product.unitName}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Text(
+                                                      "Category: ${product.categoryName}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          ),
               );
             }),
           ),

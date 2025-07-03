@@ -4,52 +4,53 @@
 
 import 'dart:convert';
 
-Loginmodel loginmodelFromJson(String str) => Loginmodel.fromJson(json.decode(str));
+Loginmodel loginmodelFromJson(String str) =>
+    Loginmodel.fromJson(json.decode(str));
 
 String loginmodelToJson(Loginmodel data) => json.encode(data.toJson());
 
 class Loginmodel {
-    bool isSucess;
-    String message;
-    LoginData data;
+  bool isSucess;
+  String message;
+  LoginData data;
 
-    Loginmodel({
-        required this.isSucess,
-        required this.message,
-        required this.data,
-    });
+  Loginmodel({
+    required this.isSucess,
+    required this.message,
+    required this.data,
+  });
 
-    factory Loginmodel.fromJson(Map<String, dynamic> json) => Loginmodel(
+  factory Loginmodel.fromJson(Map<String, dynamic> json) => Loginmodel(
         isSucess: json["isSucess"],
         message: json["message"],
         data: LoginData.fromJson(json["data"]),
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "isSucess": isSucess,
         "message": message,
         "data": data.toJson(),
-    };
+      };
 }
 
 class LoginData {
-    String accessToken;
-    String refreshToken;
-    String clientId;
-    String isPurchaseRequest;
-    String isMasters;
-    String isConsolidatedPurchase;
+  String accessToken;
+  String refreshToken;
+  String clientId;
+  String isPurchaseRequest;
+  String isMasters;
+  String isConsolidatedPurchase;
   String isDriver;
-    LoginData({
-        required this.accessToken,
-        required this.refreshToken,
-        required this.clientId,
-        required this.isPurchaseRequest,
-        required this.isMasters,
-        required this.isConsolidatedPurchase,required this.isDriver
-    });
+  LoginData(
+      {required this.accessToken,
+      required this.refreshToken,
+      required this.clientId,
+      required this.isPurchaseRequest,
+      required this.isMasters,
+      required this.isConsolidatedPurchase,
+      required this.isDriver});
 
-    factory LoginData.fromJson(Map<String, dynamic> json) => LoginData(
+  factory LoginData.fromJson(Map<String, dynamic> json) => LoginData(
         accessToken: json["_accessToken"].toString(),
         refreshToken: json["_refreshToken"].toString(),
         clientId: json["_clientID"].toString(),
@@ -57,17 +58,17 @@ class LoginData {
         isMasters: json["isMasters"].toString(),
         isConsolidatedPurchase: json["isConsolidatedPurchase"].toString(),
         isDriver: json["isDriver"].toString(),
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "_accessToken": accessToken,
         "_refreshToken": refreshToken,
         "_clientID": clientId,
         "isPurchaseRequest": isPurchaseRequest,
         "isMasters": isMasters,
         "isConsolidatedPurchase": isConsolidatedPurchase,
-        "isDriver":isDriver
-    };
+        "isDriver": isDriver
+      };
 }
 
 

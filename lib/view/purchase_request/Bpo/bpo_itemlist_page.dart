@@ -18,6 +18,8 @@ class BpoItemListPage extends StatefulWidget {
 }
 
 class _BpoItemListPageState extends State<BpoItemListPage> with RouteAware {
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -26,10 +28,14 @@ class _BpoItemListPageState extends State<BpoItemListPage> with RouteAware {
 
   void _loadData() async {
     // Fetch data on init
-    await Provider.of<BpoProvider>(context, listen: false).fetchData();
+    await Provider.of<BpoProvider>(context, listen: false)
+        .fetchData()
+        .then((value) {
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
-
- 
 
   @override
   void didPopNext() {
@@ -63,20 +69,26 @@ class _BpoItemListPageState extends State<BpoItemListPage> with RouteAware {
                   width: screenWidth * 0.87,
                   child: const Row(
                     children: [
-                      Icon(Icons.info,color:Colors.white,size: 18,),
-                      SizedBox(width: 5,),
-                      Text(
-                        "Just tap to edit your orders!",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
+                      // Icon(
+                      //   Icons.info,
+                      //   color: Colors.white,
+                      //   size: 18,
+                      // ),
+                      // SizedBox(
+                      //   width: 5,
+                      // ),
+                      // Text(
+                      //   "Just tap to edit your orders!",
+                      //   style: TextStyle(
+                      //     fontSize: 13,
+                      //     fontWeight: FontWeight.w500,
+                      //     color: Colors.white,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
-                BpolistProvider.isLoading
+                BpolistProvider.isLoading || isLoading
                     ? SizedBox(
                         height: screenHeight * 0.3,
                         child: const Center(
@@ -117,9 +129,17 @@ class _BpoItemListPageState extends State<BpoItemListPage> with RouteAware {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       BpoListPage(
-                                                         id: data.categoryId,
-                                                         items: data.items)),
-                                            );
+                                                          id: data.categoryId,
+                                                          items: data.items)),
+                                            ).then((value) {
+                                              setState(() {
+                                                isLoading = true;
+                                                BpolistProvider.fetchData();
+                                                BpolistProvider.fetchDatabyid(
+                                                    data.categoryId);
+                                                isLoading = false;
+                                              });
+                                            });
                                             log("bpo items len: ${data.items.length}");
                                           },
                                           child: Container(
@@ -151,7 +171,6 @@ class _BpoItemListPageState extends State<BpoItemListPage> with RouteAware {
                                               )),
                                         ),
                                       );
-                                     
                                     },
                                   );
                                 },

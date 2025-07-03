@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class ItemMasterProvider with ChangeNotifier {
   List<ItemData> itemdata = [];
   fetchData() async {
-    var res = await ItemMasterGetAPI(searchText:"null");
+    var res = await ItemMasterGetAPI(searchText: "null");
     if (res != 'Failed') {
       Map<String, dynamic> jsonData = json.decode(res);
       ItemModel obj = ItemModel.fromJson(jsonData);
@@ -26,35 +26,30 @@ class ItemMasterProvider with ChangeNotifier {
 
   String _searchQuery = '';
 
-  List<ItemData> get items =>
-      _filteredItems.isEmpty ? itemdata : _filteredItems;
+  List<ItemData> get items => _searchQuery.isEmpty ? itemdata : _filteredItems;
 
   String get searchQuery => _searchQuery;
-void updateSearchQuery(String query) {
-  _searchQuery = query;
-  _filteredItems = itemdata
-      .where((item) =>
-          item.productName.toLowerCase().contains(query.toLowerCase()) ||
-          item.productCode.toString().contains(query))
-      .toList();
-  notifyListeners();
-}
 
-  // void updateSearchQuery(String query) {
-  //   _searchQuery = query;
-  //   _filteredItems = itemdata
-  //       .where((item) =>
-  //           item.productName.toLowerCase().contains(query.toLowerCase()),
-  //           item.
-  //           productCode.contains(query.toLowerCase())
-  //           )
-  //       .toList();
-  //   notifyListeners();
-  // }
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    if (query.isEmpty) {
+      _filteredItems = [];
+    } else {
+      _filteredItems = itemdata
+          .where((item) =>
+              item.productName.toLowerCase().contains(query.toLowerCase()) ||
+              item.productCode
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+    }
+    notifyListeners();
+  }
 
   void clearSearch() {
     _searchQuery = '';
-    _filteredItems.clear();
+    _filteredItems = [];
     notifyListeners();
   }
 }

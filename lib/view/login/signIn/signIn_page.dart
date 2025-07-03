@@ -12,15 +12,34 @@ class SignInPage extends StatefulWidget {
   _SignInPageState createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-
-    String appVersion = '';
+  String appVersion = '';
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _getAppVersion();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _getAppVersion() async {
@@ -35,6 +54,7 @@ class _SignInPageState extends State<SignInPage> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -47,7 +67,7 @@ class _SignInPageState extends State<SignInPage> {
           key: _formKey,
           child: Stack(
             children: [
-              // Background Image with blur effect for modern style
+              // Original background image with overlay
               Container(
                 height: screenHeight,
                 width: screenWidth,
@@ -56,140 +76,285 @@ class _SignInPageState extends State<SignInPage> {
                     image: AssetImage(common_backgroundImage),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Colors.black54,
-                        BlendMode
-                            .darken), // Adding a dark overlay for better text contrast
+                      Colors.black54,
+                      BlendMode.darken,
+                    ),
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: screenHeight * 0.08,
-                  horizontal: screenWidth * 0.08,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Title with a larger, bold font
-                      Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontSize: screenHeight * 0.04,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 1.5, // Modern spacing between letters
+
+              // Animated content
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: screenHeight * 0.08,
+                    horizontal: screenWidth * 0.08,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Modern Sign In header
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            //  color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            // border: Border.all(
+                            //   color: Colors.white.withOpacity(0.2),
+                            //   width: 1,
+                            // ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // App Name
+                              Text(
+                                'Easy Stock',
+                                style: TextStyle(
+                                  fontSize: screenHeight * 0.032,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // const SizedBox(height: 8),
+                              // Divider
+                              // Container(
+                              //   width: 100,
+                              //   height: 2,
+                              //   decoration: BoxDecoration(
+                              //     gradient: LinearGradient(
+                              //       colors: [
+                              //         primaryColor,
+                              //         primaryColor.withOpacity(0.5),
+                              //       ],
+                              //     ),
+                              //     borderRadius: BorderRadius.circular(2),
+                              //   ),
+                              // ),
+                              // const SizedBox(height: 12),
+                              // Sign In Text
+                              // Row(
+                              //   mainAxisSize: MainAxisSize.min,
+                              //   children: [
+                              //     Icon(
+                              //       Icons.login_rounded,
+                              //       size: 24,
+                              //       color: Colors.white.withOpacity(0.9),
+                              //     ),
+                              //     const SizedBox(width: 8),
+                              //     Text(
+                              //       'Welcome Back',
+                              //       style: TextStyle(
+                              //         fontSize: screenHeight * 0.022,
+                              //         fontWeight: FontWeight.w500,
+                              //         color: Colors.white.withOpacity(0.9),
+                              //         letterSpacing: 1,
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: screenHeight * 0.04),
+                        // SizedBox(height: screenHeight * 0.04),
 
-                      // Username Text Field
-                      Consumer<SignInProvider>(
-                        builder: (context, provider, child) {
-                          return Container(
-                            height: screenHeight * 0.06,
-                            width: screenWidth * 0.98,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12)),
-                            child: TextFormField(
-                              controller: provider.usernameController,
-                              decoration: const InputDecoration(
-                                hintText: 'Tenant Name',
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 16),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your username';
-                                }
-                                return null;
-                              },
+                        // Modern form container
+                        Container(
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
                             ),
-                          );
-                        },
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-
-                      // User Code Text Field
-                      Consumer<SignInProvider>(
-                        builder: (context, provider, child) {
-                          return Container(
-                            height: screenHeight * 0.06,
-                            width: screenWidth * 0.98,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12)),
-                            child: TextFormField(
-                              controller: provider.userCodeController,
-                              decoration: const InputDecoration(
-                                hintText: 'User Code',
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 16),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your user code';
-                                }
-                                return null;
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-
-                      _buildPasswordField(context),
-                      SizedBox(height: screenHeight * 0.035),
-                      Row(
-                        children: [
-                          Consumer<SignInProvider>(
-                            builder: (context, provider, child) {
-                              return Checkbox(
-                                activeColor: primaryColor,
-                                checkColor: Colors.black,
-                                value: provider.isRemembered,
-                                onChanged: (bool? value) {
-                                  provider.toggleRememberMe(value ?? false);
+                          ),
+                          child: Column(
+                            children: [
+                              // Tenant Name field
+                              Consumer<SignInProvider>(
+                                builder: (context, provider, child) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.2),
+                                      ),
+                                    ),
+                                    child: TextFormField(
+                                      cursorColor: primaryColor,
+                                      controller: provider.usernameController,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        hintText: 'Tenant Name',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 15,
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.business,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your username';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  );
                                 },
-                              );
-                            },
-                          ),
-                          Text(
-                            'Remember me?',
-                            style: TextStyle(
-                              fontSize: screenHeight * 0.015,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight * 0.0081),
-                      // Login Button with gradient and shadow for modern design
-                      _buildLoginButton(context),
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
 
-                      SizedBox(height: screenHeight * 0.01),
-                    ],
+                              // User Code field
+                              Consumer<SignInProvider>(
+                                builder: (context, provider, child) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.2),
+                                      ),
+                                    ),
+                                    child: TextFormField(
+                                      cursorColor: primaryColor,
+                                      controller: provider.userCodeController,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        hintText: 'User Code',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 15,
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.person_outline,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your user code';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+
+                              // Password field
+                              _buildPasswordField(context),
+                              SizedBox(height: screenHeight * 0.012),
+
+                              // Remember me with modern design
+                              Row(
+                                children: [
+                                  Consumer<SignInProvider>(
+                                    builder: (context, provider, child) {
+                                      return Container(
+                                        // decoration: BoxDecoration(
+                                        // color: Colors.white.withOpacity(0.1),
+                                        // borderRadius:
+                                        //     BorderRadius.circular(6),
+                                        // border: Border.all(
+                                        //   color:
+                                        //       Colors.white.withOpacity(0.2),
+                                        // ),
+                                        // ),
+                                        child: Checkbox(
+                                          activeColor: primaryColor,
+                                          checkColor: Colors.white,
+                                          value: provider.isRemembered,
+                                          onChanged: (bool? value) {
+                                            provider.toggleRememberMe(
+                                                value ?? false);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    'Remember me?',
+                                    style: TextStyle(
+                                      fontSize: screenHeight * 0.015,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: screenHeight * 0.012),
+
+                              // Login button with modern design
+                              _buildLoginButton(context),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
+
+              // Version text with modern design
               Positioned(
-                  bottom: screenHeight * 0.02,
-                  left: 0,
-                  right: 0,
-                  child:  Center(
+                bottom: screenHeight * 0.032,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                        // color: Colors.black.withOpacity(0.3),
+                        // borderRadius: BorderRadius.circular(20),
+                        // border: Border.all(
+                        //   color: Colors.white.withOpacity(0.1),
+                        // ),
+                        ),
                     child: Text(
                       'Version: $appVersion',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(0.8),
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -197,79 +362,43 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  // Widget to build text fields with icons
-  Widget _buildTextFieldWithIcon(BuildContext context,
-      {required String hintText,
-      required IconData icon,
-      required TextEditingController controller,
-      required String validatorMessage}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle:
-              TextStyle(color: Colors.grey[600]), // Subtle placeholder color
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-          prefixIcon:
-              Icon(icon, color: Colors.orange[700]), // Icon at the start
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return validatorMessage;
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  // Widget for the password field with an icon and toggle visibility
+  // Modern Password Field
   Widget _buildPasswordField(BuildContext context) {
     return Consumer<SignInProvider>(
       builder: (context, provider, child) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+            ),
           ),
           child: TextFormField(
+            cursorColor: primaryColor,
             controller: provider.passwordController,
             obscureText: provider.obscureText,
+            style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Password',
-              hintStyle: TextStyle(color: Colors.grey[600]),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.6),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
               border: InputBorder.none,
-              prefixIcon: Icon(Icons.lock,
-                  color: Colors.orange[700]), // Lock icon at the start
+              prefixIcon: Icon(
+                Icons.lock_outline,
+                color: Colors.white.withOpacity(0.6),
+              ),
               suffixIcon: IconButton(
                 icon: Icon(
                   provider.obscureText
                       ? Icons.visibility_off
                       : Icons.visibility,
-                  color: Colors.grey[700],
+                  color: Colors.white.withOpacity(0.6),
                 ),
                 onPressed: provider.togglePasswordVisibility,
               ),
@@ -286,7 +415,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  // Login Button widget
+  // Modern Login Button
   Widget _buildLoginButton(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
@@ -310,16 +439,19 @@ class _SignInPageState extends State<SignInPage> {
             width: screenWidth * 0.9,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.orange[600]!, Colors.orange[400]!],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                colors: [
+                  primaryColor,
+                  primaryColor.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.orangeAccent.withOpacity(0.4),
+                  color: primaryColor.withOpacity(0.3),
                   blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -327,15 +459,26 @@ class _SignInPageState extends State<SignInPage> {
               child: provider.isLoading
                   ? const CircularProgressIndicator(
                       color: Colors.white,
+                      strokeWidth: 3,
                     )
-                  : Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.025,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.0, // Modern look for text
-                      ),
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: screenHeight * 0.025,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
+                      ],
                     ),
             ),
           ),

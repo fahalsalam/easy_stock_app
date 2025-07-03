@@ -6,6 +6,7 @@ import 'package:easy_stock_app/view/purchase_request/common_widgets/buildTextRow
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../utils/common_widgets/background_image_widget.dart';
+import '../../../utils/constants/colors/colors.dart';
 
 class PendingDetailsPage extends StatefulWidget {
   String orderID, editNo;
@@ -48,154 +49,364 @@ class _PendingDetailsPageState extends State<PendingDetailsPage> {
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
           Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: 'Pending'),
+            top: screenHeight * 0.05,
+            left: screenWidth * 0.05,
+            child: CustomAppBar(txt: 'Pending Details'),
           ),
           Positioned(
             top: screenHeight * 0.13,
-            left: 20,
-            right: 20,
+            left: 0,
+            right: 0,
             bottom: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isLoading
-                    ? SizedBox(
-                        height: screenHeight * 0.5,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Section
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white24, width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          child: const Icon(
+                            Icons.pending_actions,
+                            color: Colors.orange,
+                            size: 18,
                           ),
                         ),
-                      )
-                    : provider.pendingDetails.isEmpty
-                        ? SizedBox(
-                            height: screenHeight * 0.3,
-                            child: const Center(
-                              child: Text(
-                                "No Data",
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Pending Items",
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
                               ),
+                              const SizedBox(height: 3),
+                              Text(
+                                "Order ID: ${widget.orderID}",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Content Section
+                  isLoading
+                      ? Container(
+                          height: screenHeight * 0.38,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white24, width: 1),
+                          ),
+                          child: const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: primaryColor,
+                                  strokeWidth: 2.5,
+                                ),
+                                SizedBox(height: 14),
+                                Text(
+                                  "Loading pending items...",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
-                          )
-                        : Expanded(
-                            child: ListView.builder(
-                                padding:
-                                    const EdgeInsets.only(bottom: 25, top: 25),
+                          ),
+                        )
+                      : provider.pendingDetails.isEmpty
+                          ? Container(
+                              height: screenHeight * 0.38,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(10),
+                                border:
+                                    Border.all(color: Colors.white24, width: 1),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.inventory_2_outlined,
+                                      size: 42,
+                                      color: Colors.white.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    const Text(
+                                      "No Pending Items",
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 7),
+                                    Text(
+                                      "All items have been processed",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.white.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(10),
+                                border:
+                                    Border.all(color: Colors.white24, width: 1),
+                              ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(10),
                                 itemCount: provider.pendingDetails.length,
                                 itemBuilder: (context, index) {
                                   PendingDetailsData detail =
                                       provider.pendingDetails[index];
 
                                   return Padding(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: const EdgeInsets.only(bottom: 10),
                                     child: Container(
-                                      height: screenHeight * 0.09,
-                                      width: screenWidth * 0.06,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.grey.withOpacity(0.2),
+                                        color: Colors.white.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                            color: Colors.white24, width: 1),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Container(
-                                            height: screenHeight * 0.04,
-                                            width: screenWidth * 0.12,
-                                            decoration: BoxDecoration(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Row(
+                                          children: [
+                                            // Product Image
+                                            Container(
+                                              height: screenHeight * 0.07,
+                                              width: screenWidth * 0.14,
+                                              decoration: BoxDecoration(
                                                 borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: Image.network(
-                                                detail.imageUrl.toString(),
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                        stackTrace) =>
-                                                    const Icon(
-                                                  Icons.image,
-                                                  size: 30,
-                                                  color: Colors.white,
+                                                    BorderRadius.circular(7),
+                                                border: Border.all(
+                                                    color: Colors.white24,
+                                                    width: 1),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(7),
+                                                child: Image.network(
+                                                  detail.imageUrl.toString(),
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                          stackTrace) =>
+                                                      Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white
+                                                          .withOpacity(0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              7),
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.image,
+                                                      size: 22,
+                                                      color: Colors.white54,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          // SizedBox(
-                                          //   width: screenWidth * 0.00,
-                                          // ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                            const SizedBox(width: 10),
+
+                                            // Product Details
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  // SizedBox(
-                                                  //   width: screenWidth * 0.001,
-                                                  // ),
-                                                  SizedBox(
-                                                    width: screenWidth * 0.5,
-                                                    child: Text(
-                                                      detail.productName,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.white,
-                                                          fontSize: 14), overflow:
-                                                          TextOverflow.ellipsis,
+                                                  Text(
+                                                    detail.productName,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                      fontSize: 13,
                                                     ),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                  SizedBox(
-                                                    width: screenWidth * 0.001,
+                                                  const SizedBox(height: 7),
+
+                                                  // Quantity and Price Row
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 7,
+                                                                vertical: 3),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white
+                                                              .withOpacity(0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                        child: Text(
+                                                          '${double.parse(detail.qty).toStringAsFixed(2)} ${detail.uomCode}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 11,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: primaryColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 7),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 7,
+                                                                vertical: 3),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: primaryColor
+                                                              .withOpacity(0.2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                        child: Text(
+                                                          'AED ${double.parse(detail.price).toStringAsFixed(2)}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 11,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: primaryColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
-                                              SizedBox(
-                                                height: screenHeight * 0.01,
+                                            ),
+
+                                            // Status Indicator
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 7,
+                                                      vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: Colors.orange
+                                                    .withOpacity(0.2),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                border: Border.all(
+                                                    color: Colors.orange,
+                                                    width: 1),
                                               ),
-                                              Row(
-                                                children: [
-                                                  buildContentText(
-                                                      "Qty:",
-                                                      double.parse(detail.qty)
-                                                          .toStringAsFixed(2),
-                                                      screenWidth),
-                                                  buildContentText(
-                                                      "Price:",
-                                                      double.parse(detail.price)
-                                                          .toStringAsFixed(2),
-                                                      screenWidth),
-                                                ],
+                                              child: const Text(
+                                                "Pending",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.orange,
+                                                ),
                                               ),
-                                              Row(
-                                                children: [
-                                                  buildContentText(
-                                                      "Uom:",
-                                                      detail.uomCode,
-                                                      screenWidth),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
-                                }),
+                                },
+                              ),
+                            ),
+
+                  // Summary Section
+                  if (!isLoading && provider.pendingDetails.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white24, width: 1),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.shopping_cart_outlined,
+                                  color: Colors.white70, size: 17),
+                              const SizedBox(width: 7),
+                              const Text(
+                                "Total Pending Items:",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 7),
+                              Text(
+                                "${provider.pendingDetails.length}",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-              ],
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  SizedBox(height: screenHeight * 0.03),
+                ],
+              ),
             ),
           ),
         ],

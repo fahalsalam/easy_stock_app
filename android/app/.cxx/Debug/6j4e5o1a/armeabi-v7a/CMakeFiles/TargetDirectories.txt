@@ -1,0 +1,2 @@
+/Users/apple/VDR_Bavkup/easystock/android/app/.cxx/Debug/6j4e5o1a/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/apple/VDR_Bavkup/easystock/android/app/.cxx/Debug/6j4e5o1a/armeabi-v7a/CMakeFiles/rebuild_cache.dir

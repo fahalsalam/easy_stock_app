@@ -31,19 +31,32 @@ class VehicleManagementProvider with ChangeNotifier {
       Map<String, dynamic> jsonData = json.decode(res);
       VehicleMastermodel obj = VehicleMastermodel.fromJson(jsonData);
       data = obj.data;
-      print("${obj.data.first.vehicleId}");
+
+      // Only try to access data if it's not empty
+      if (data.isNotEmpty) {
+        log("First vehicle ID: ${obj.data.first.vehicleId}");
+      }
+
       notifyListeners();
-      vehicles = (jsonData['data'] as List)
-          .map<Map<String, dynamic>>((item) => {
-                'id': item['vehicleID'].toString(),
-                'name': item['vehicleName'].toString(),
-              })
-          .toList();
-      vehicleList = obj.data;
+
+      // Update vehicles list only if there's data
+      if (jsonData['data'] != null && jsonData['data'] is List) {
+        vehicles = (jsonData['data'] as List)
+            .map<Map<String, dynamic>>((item) => {
+                  'id': item['vehicleID'].toString(),
+                  'name': item['vehicleName'].toString(),
+                })
+            .toList();
+        vehicleList = obj.data;
+      } else {
+        vehicles = [];
+        vehicleList = [];
+      }
     } else {
       data = [];
+      vehicles = [];
+      vehicleList = [];
       notifyListeners();
-      return;
     }
   }
 

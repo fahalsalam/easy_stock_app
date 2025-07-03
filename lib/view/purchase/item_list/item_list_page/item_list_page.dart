@@ -38,7 +38,6 @@ class _ItemListPageState extends State<ItemListPage> {
   @override
   Widget build(BuildContext context) {
     final itemListProvider = Provider.of<PurchaseItemListProvider>(context);
-
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
@@ -46,198 +45,199 @@ class _ItemListPageState extends State<ItemListPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: 10,
-            right: 10,
-            child: Container(
-              height: screenHeight * 0.06,
-              width: screenWidth * 0.9,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 42,
-                    width: 40,
+          // Make the entire content scrollable
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                // Top spacing for status bar
+                SizedBox(height: screenHeight * 0.06),
+
+                // Header with back button and search
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Container(
+                    height: screenHeight * 0.06,
+                    width: screenWidth * 0.9,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: IconButton(
-                      onPressed: () {
-                        if (itemListProvider.cartItems.isNotEmpty) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text("Unsaved Changes"),
-                                content: const Text(
-                                    "Please Confirm Cart before existing"),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(
-                                          context); // Close the dialog without going back
-                                    },
-                                    child: const Text(
-                                      "Cancel",
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      itemListProvider.clearCartItems();
-                                      Navigator.pop(
-                                          context); // Close the dialog
-                                      Navigator.pop(
-                                          context); // Go back to the previous screen without saving
-                                    },
-                                    child: const Text("Exit Without Saving"),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        } else {
-                          Navigator.pop(context);
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        size: 22,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: TextFormField(
-                        controller: _searchController,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 42,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: IconButton(
                             onPressed: () {
-                              itemListProvider
-                                  .searchByApi(_searchController.text);
+                              if (itemListProvider.cartItems.isNotEmpty) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text("Unsaved Changes"),
+                                      content: const Text(
+                                          "Please Confirm Cart before existing"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); // Close the dialog without going back
+                                          },
+                                          child: const Text(
+                                            "Cancel",
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            itemListProvider.clearCartItems();
+                                            Navigator.pop(
+                                                context); // Close the dialog
+                                            Navigator.pop(
+                                                context); // Go back to the previous screen without saving
+                                          },
+                                          child:
+                                              const Text("Exit Without Saving"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                Navigator.pop(context);
+                              }
                             },
-                            icon: Icon(Icons.search,
-                                color: _searchController.text.isEmpty
-                                    ? Colors.grey
-                                    : Colors.white),
-                          ),
-                          hintText: 'Search...',
-                          hintStyle: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.withOpacity(0.15),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 16.0,
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              size: 22,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                        // onChanged: (value) {
-                        //   print('Search query: $value');
-                        //   itemListProvider.searchProducts(value);
-                        // },
-                      ),
+                        Expanded(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: TextFormField(
+                              controller: _searchController,
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    itemListProvider
+                                        .searchByApi(_searchController.text);
+                                  },
+                                  icon: Icon(Icons.search,
+                                      color: _searchController.text.isEmpty
+                                          ? Colors.grey
+                                          : Colors.white),
+                                ),
+                                hintText: 'Search...',
+                                hintStyle: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey.withOpacity(0.15),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.13,
-            child: SizedBox(
-              height: screenHeight * 0.9,
-              child: Stack(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.5),
-                        child: buildCategoryList(
-                          itemListProvider,
-                          // categoryListProvider,
-                          // cartProvider,
-                          screenHeight,
-                          screenWidth,
-                        ),
+                ),
+
+                SizedBox(height: screenHeight * 0.01),
+
+                // Main content area with categories and items
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.5),
+                      child: buildCategoryList(
+                        itemListProvider,
+                        screenHeight,
+                        screenWidth,
                       ),
-                      Padding(
+                    ),
+                    Expanded(
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: itemListProvider.isLoading
-                            ? Center(
-                                child: Padding(
-                                  padding:
-                                      EdgeInsets.only(left: screenWidth * 0.34),
-                                  child: const CircularProgressIndicator(
+                            ? SizedBox(
+                                height: screenHeight * 0.5,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
                                     color: Colors.white,
                                   ),
                                 ),
                               )
-                            : buildItemList(
+                            : buildItemListScrollable(
                                 screenHeight,
                                 screenWidth,
                                 itemListProvider,
                                 _searchController.text.isEmpty
-                                  ?   itemListProvider.filteredProductDatas
-                                     : itemListProvider.itemdata,
-                                // cartProvider,
+                                    ? itemListProvider.filteredProductDatas
+                                    : itemListProvider.itemdata,
                               ),
                       ),
-                    ],
-                  ),
-                  Visibility(
-                    visible: itemListProvider.cartItems.isNotEmpty &&
-                        itemListProvider.isCartVisible == true,
-                    child: Positioned(
-                      bottom: screenHeight * 0.05,
-                      left: 20,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: screenHeight * 0.05,
-                            width: screenWidth * 0.9,
-                            child: GotoCartButton(
-                              txt: "Go to Cart",
-                              screenHeight: screenHeight * 0.05,
-                              screenWidth: screenWidth * 0.7,
-                              length: itemListProvider.cartItems.length,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ItemlistCartPage(),
-                                  ),
-                                );
-                              },
-                            ),
+                    ),
+                  ],
+                ),
+
+                // Bottom spacing for cart button
+                SizedBox(height: screenHeight * 0.15),
+              ],
+            ),
+          ),
+
+          // Fixed cart button at bottom
+          if (itemListProvider.cartItems.isNotEmpty &&
+              itemListProvider.isCartVisible == true)
+            Positioned(
+              bottom: screenHeight * 0.05,
+              left: 20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: screenHeight * 0.05,
+                    width: screenWidth * 0.9,
+                    child: GotoCartButton(
+                      txt: "Go to Cart",
+                      screenHeight: screenHeight * 0.05,
+                      screenWidth: screenWidth * 0.7,
+                      length: itemListProvider.cartItems.length,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ItemlistCartPage(),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ),
-          ),
         ],
       ),
     );

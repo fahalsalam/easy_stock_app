@@ -18,53 +18,72 @@ class _SearchWidgetState extends State<SearchWidget> {
     var screenWidth = MediaQuery.of(context).size.width;
     return Consumer<HomepageProvider>(
       builder: (context, provider, child) {
-        return Container(
-          height: screenHeight * 0.05,
-          width: screenWidth * 0.88,
-          decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 95, 92, 49).withOpacity(0.3),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 0.3, color: Colors.white)),
-          child: Center(
-            child: TextFormField(
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-              ),
-              controller: provider.searchController,
-              decoration: InputDecoration(
-               suffixIcon: IconButton(onPressed: (){
-                  
-               },
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.white,
-                  size: 25,
-                )),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                hintText: 'Search item name  or item code',
-                border: InputBorder.none,
-                hintStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color.fromARGB(255, 211, 209, 154),
+        return Column(
+          children: [
+            Container(
+              height: screenHeight * 0.05,
+              width: screenWidth * 0.88,
+              decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 95, 92, 49).withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 0.3, color: Colors.white)),
+              child: Center(
+                child: TextFormField(
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  controller: provider.searchController,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        // Clear search and reset list
+                        provider.searchController.clear();
+                        itemmasterProvider.clearSearch();
+                      },
+                      icon: const Icon(
+                        Icons.search,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    hintText: 'Search item name or item code',
+                    border: InputBorder.none,
+                    hintStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Color.fromARGB(255, 211, 209, 154),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    itemmasterProvider.updateSearchQuery(value);
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter text';
+                    }
+                    return null;
+                  },
                 ),
               ),
-              onChanged: (value) {
-                itemmasterProvider.updateSearchQuery(value);
-
-              },
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter text';
-                }
-                // Additional validation can be added here
-                return null;
-              },
             ),
-          ),
+            if (provider.searchController.text.isNotEmpty &&
+                itemmasterProvider.items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  'No items found',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );

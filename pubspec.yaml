@@ -2,7 +2,7 @@ name: easy_stock_app
 description: A new Flutter project for stock management.
 publish_to: 'none' 
 
-version: 2.0.0+1
+version: 5.0.0+1
 
 environment:
   sdk: '>=3.1.5 <4.0.0'
@@ -41,7 +41,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_blue_plus: ^1.34.5
   permission_handler: ^11.3.1
-  print_bluetooth_thermal: ^1.0.9
+  print_bluetooth_thermal: ^1.1.6
   esc_pos_utils_plus: ^2.0.4
   flutter_pdfview: ^1.4.0
  

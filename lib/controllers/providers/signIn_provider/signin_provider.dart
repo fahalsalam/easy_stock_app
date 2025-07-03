@@ -61,9 +61,9 @@ class SignInProvider with ChangeNotifier {
   // Save credentials to device storage
   Future<void> saveCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', usernameController.text);
+    await prefs.setString('userCode', userCodeController.text);
     if (_isChecked) {
-      await prefs.setString('username', usernameController.text);
-      await prefs.setString('userCode', userCodeController.text);
       await prefs.setString('password', passwordController.text);
       await prefs.setBool('isChecked', true);
     } else {
@@ -89,11 +89,11 @@ class SignInProvider with ChangeNotifier {
 
   Future<void> saveLoginDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    await prefs.setString('username', usernameController.text);
+    await prefs.setString('userCode', userCodeController.text);
     if (_isRemembered) {
       // Save user credentials to SharedPreferences
-      await prefs.setString('username', usernameController.text);
-      await prefs.setString('userCode', userCodeController.text);
+
       await prefs.setString('password', passwordController.text);
       await prefs.setBool('isRememberMe', true);
     } else {
@@ -108,6 +108,9 @@ class SignInProvider with ChangeNotifier {
   // Simulate an API call (can be replaced with your actual sign-in API call)
   Future<void> signIn(BuildContext context) async {
     setLoading(true); // Show a loading indicator
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', usernameController.text);
+    await prefs.setString('userCode', userCodeController.text);
     try {
       // Await the API call to get the actual String result
       String res = await LoginAPI(

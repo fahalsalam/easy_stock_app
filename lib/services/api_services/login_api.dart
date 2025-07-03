@@ -6,6 +6,7 @@ import 'package:easy_stock_app/utils/constants/loginConstants.dart';
 import 'package:easy_stock_app/utils/token_manager/token_manager.dart';
 import 'package:easy_stock_app/utils/urls.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<String> LoginAPI({
   required String tenantName,
@@ -33,7 +34,7 @@ Future<String> LoginAPI({
 
     // Check if the response is successful
     if (response.statusCode == 200) {
-      log("Login successful: ${response.body}");
+      log("-------------------------------->>> Login successful: ${response.body}");
 
       // Parse the JSON response
       Map<String, dynamic> jsonData = json.decode(response.body);
@@ -56,6 +57,8 @@ Future<String> LoginAPI({
       isPurchase = loginResponse.data.isPurchaseRequest;
       isDriver = loginResponse.data.isDriver;
       customerID = loginResponse.data.clientId;
+      // tenantName = loginResponse.data.TenantName;
+      // userName = loginResponse.data.UserName;
 
       // );
 
@@ -63,6 +66,14 @@ Future<String> LoginAPI({
       log("isConsolidatedPurchase: ${isOrder}");
       log("isPurchaseRequest: ${isPurchase}");
       log("isDriver: ${isDriver}");
+      log("clientId: ${customerID}");
+      // log("TenantName: ${loginResponse.data.TenantName}");
+      // log("UserName: ${loginResponse.data.UserName}");
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // prefs.setString('username', tenantName);
+      // prefs.setString('userCode', userName);
+      // prefs.setString('password', password);
+      // prefs.setBool('isRememberMe', true);
       // Return 'Failed' if access token is null
       if (loginResponse.data.accessToken.isEmpty) {
         return 'Failed';

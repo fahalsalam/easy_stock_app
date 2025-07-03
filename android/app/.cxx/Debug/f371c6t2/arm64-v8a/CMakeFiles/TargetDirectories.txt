@@ -1,0 +1,2 @@
+/Users/apple/Fahal/easystock/android/app/.cxx/Debug/f371c6t2/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/apple/Fahal/easystock/android/app/.cxx/Debug/f371c6t2/arm64-v8a/CMakeFiles/rebuild_cache.dir

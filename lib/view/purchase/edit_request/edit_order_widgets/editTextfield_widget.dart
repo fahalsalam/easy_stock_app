@@ -1,114 +1,131 @@
-
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:easy_stock_app/utils/common_widgets/smackbar.dart';
-
 
 class QtyButtonWidget extends StatefulWidget {
   final double screenHeight;
   final double screenWidth;
   final String initialQuantity;
-  final void Function(String value) onSubmit;
+  final Function(String) onSubmit;
 
-  QtyButtonWidget({
-    Key? key,
+  const QtyButtonWidget({
+    super.key,
     required this.screenHeight,
     required this.screenWidth,
     required this.initialQuantity,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
-  _QtyButtonWidgetState createState() => _QtyButtonWidgetState();
+  State<QtyButtonWidget> createState() => _QtyButtonWidgetState();
 }
 
 class _QtyButtonWidgetState extends State<QtyButtonWidget> {
- late  TextEditingController quantityController = TextEditingController(text: widget.initialQuantity);
+  late TextEditingController _controller;
+  double currentQty = 0;
 
   @override
-  void dispose() {
-    quantityController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialQuantity);
+    currentQty = double.tryParse(widget.initialQuantity) ?? 0;
   }
 
-  void _handleQuantitySubmit(String value) {
-    final enteredQuantity = double.tryParse(value) ?? 0;
-    log("enteredQuantity: $enteredQuantity, $value");
-    if (enteredQuantity > 0) {
-      widget.onSubmit(enteredQuantity.toString());
-      log("Quantity submitted: $enteredQuantity");
-      // Uncomment if you want to show a snackbar
-      showSnackBar(context, "", "Quantity Updated", Colors.white);
-    } else {
-      showSnackBar(context, "", "Enter a valid quantity", Colors.red);
+  void _updateQuantity(double newQty) {
+    if (newQty >= 0) {
+      setState(() {
+        currentQty = newQty;
+        _controller.text = newQty.toStringAsFixed(2);
+      });
+      widget.onSubmit(_controller.text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.screenHeight * 0.032,
-      width: widget.screenWidth * 0.32,
-      margin: const EdgeInsets.only(top: 0),
+      height: widget.screenHeight * 0.04,
+      width: widget.screenWidth * 0.25,
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // TextField to input quantity
-            Expanded(
-              child: TextField(
-                
-                controller: quantityController,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                  // hintText: widget.initialQuantity.isEmpty
-                  //     ? '0'
-                  //     : widget.initialQuantity,
-                  hintStyle: const TextStyle(color: Colors.white),
-                ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Minus button
+          SizedBox(
+            width: widget.screenWidth * 0.06,
+            child: IconButton(
+              onPressed: currentQty <= 0
+                  ? null
+                  : () {
+                      _updateQuantity(currentQty - 1);
+                    },
+              icon: Icon(
+                Icons.remove,
+                size: 16,
+                color: currentQty <= 0 ? Colors.grey : Colors.white,
               ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
             ),
-            GestureDetector(
-              onTap: () => _handleQuantitySubmit(quantityController.text), // Pass the value
-              child: const Text(
-                'ADD',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+          ),
+          // Text field
+          Container(
+            width: widget.screenWidth * 0.13,
+            alignment: Alignment.center,
+            child: TextFormField(
+              controller: _controller,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
               ),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                border: InputBorder.none,
+              ),
+              onChanged: (value) {
+                double? newQty = double.tryParse(value);
+                if (newQty != null && newQty >= 0) {
+                  setState(() {
+                    currentQty = newQty;
+                  });
+                  widget.onSubmit(value);
+                }
+              },
             ),
-          ],
-        ),
+          ),
+          // Plus button
+          SizedBox(
+            width: widget.screenWidth * 0.06,
+            child: IconButton(
+              onPressed: () {
+                _updateQuantity(currentQty + 1);
+              },
+              icon: const Icon(
+                Icons.add,
+                size: 16,
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
-
-

@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'package:easy_stock_app/controllers/providers/purchase_providers/lpoList_providers/lpoList_provider.dart';
 import 'package:easy_stock_app/models/purchase_order/lpoModel.dart';
+import 'package:easy_stock_app/services/api_services/purchase_order/get_purchase_order_api.dart';
 import 'package:easy_stock_app/utils/common_widgets/custom_appbar.dart';
+import 'package:easy_stock_app/utils/common_widgets/smackbar.dart';
 import 'package:easy_stock_app/utils/constants/colors/colors.dart';
 import 'package:easy_stock_app/utils/constants/images/images.dart';
 import 'package:easy_stock_app/view/purchase/edit_request/edit_order_list/edit_order_list_page.dart';
@@ -18,12 +20,39 @@ class OrderListpage extends StatefulWidget {
 }
 
 class _OrderListpageState extends State<OrderListpage> {
+  bool isLoading = false;
+
+  Future<void> _loadData() async {
+    if (!mounted) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final provider = Provider.of<LpolistProvider>(context, listen: false);
+      provider.resetChanged();
+
+      await getPurchaseorderApi();
+      await provider.fetchData();
+    } catch (e) {
+      log("Error loading data: $e");
+      if (mounted) {
+        showSnackBar(context, "", "Error loading data", Colors.red);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LpolistProvider>(context, listen: false).fetchData();
-    });
+    _loadData();
   }
 
   @override
@@ -40,62 +69,71 @@ class _OrderListpageState extends State<OrderListpage> {
             top: screenHeight * 0.06,
             left: screenWidth * 0.02,
             right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "Edit Order"),
+            child: CustomAppBar(txt: "View Order"),
           ),
           Positioned(
-            top: screenHeight * 0.13,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "LPO List",
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+            top: screenHeight * 0.142,
+            left: 15,
+            right: 15,
+            bottom: 0,
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
                     ),
-                    const Text(
-                      "You can view allowed times only",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: screenHeight * 0.8,
-                      child: lpoListProvider.lpoData.isEmpty
-                          ? const Center(
-                              child: Text(
-                                "No Product Data",
+                  )
+                : lpoListProvider.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadData,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "LPO List",
                                 style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
                               ),
-                            )
-                          : ListView.builder(
-                              padding: EdgeInsets.only(bottom: 20),
-                              itemCount: lpoListProvider.lpoData.length,
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                final lpodata = lpoListProvider.lpoData[index];
-                                return buildLpoItem(context, lpodata,
-                                    screenHeight, screenWidth);
-                              }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                              const SizedBox(height: 10),
+                              Container(
+                                height: screenHeight * 0.8,
+                                child: lpoListProvider.lpoData.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                          "No Product Data",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 20),
+                                        itemCount:
+                                            lpoListProvider.lpoData.length,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          final lpodata =
+                                              lpoListProvider.lpoData[index];
+                                          return buildLpoItem(context, lpodata,
+                                              screenHeight, screenWidth);
+                                        }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
           ),
         ],
       ),
@@ -137,7 +175,7 @@ class _OrderListpageState extends State<OrderListpage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: screenWidth*0.4,
+                  width: screenWidth * 0.4,
                   child: Text(
                     lpodata.customerName,
                     style: const TextStyle(
@@ -172,10 +210,8 @@ class _OrderListpageState extends State<OrderListpage> {
                 GestureDetector(
                   onTap: () async {
                     log("${lpodata.orderId}, ${lpodata.editNo}");
-
                     try {
-                      // Push to the EditOrderListPage
-                      await Navigator.push(
+                      final result = await Navigator.push<bool>(
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditOrderListPage(
@@ -184,45 +220,34 @@ class _OrderListpageState extends State<OrderListpage> {
                           ),
                         ),
                       );
-
-                      // After returning from EditOrderListPage, fetch new data
-                      await Provider.of<LpolistProvider>(context, listen: false)
-                          .fetchData();
+                      log("result: $result");
+                      if (result == true && mounted) {
+                        await _loadData();
+                      }
                     } catch (e) {
-                      // Handle any errors that occur during navigation or data fetching
                       log("Error occurred: $e");
-                      // Optionally show a flushbar or dialog to notify the user
+                      if (mounted) {
+                        showSnackBar(
+                            context, "", "Error loading data", Colors.red);
+                      }
                     }
                   },
-                  child: const Icon(
-                    Icons.edit,
-                    size: 18,
-                    color: Colors.white,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.edit,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-
-                // GestureDetector(
-                //   onTap: () {
-                //     log("${lpodata.orderId}, ${lpodata.editNo}");
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => EditOrderListPage(
-                //           orderId: lpodata.orderId.toString(),
-                //           editNo: lpodata.editNo.toString(),
-                //         ),
-                //       ),
-                //     ).then((_) async {
-                //       await Provider.of<LpolistProvider>(context, listen: false)
-                //           .fetchData();
-                //     });
-                //   },
-                //   child: const Icon(
-                //     Icons.edit,
-                //     size: 18,
-                //     color: Colors.white,
-                //   ),
-                // ),
               ],
             ),
           ],

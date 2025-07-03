@@ -65,7 +65,7 @@ class _MastersMainPageState extends State<MastersMainPage> {
                     mainAxisSpacing: 8.0,
                     childAspectRatio: 6 / 4,
                   ),
-                  itemCount: 7,
+                  itemCount: 6,
                   itemBuilder: (context, index) {
                     List<String> titleList = [
                       "Item Master",
@@ -74,7 +74,7 @@ class _MastersMainPageState extends State<MastersMainPage> {
                       "User Configure",
                       "Vehicle \nManagement",
                       "Customer",
-                      "General Settings"
+                      // "General Settings"
                     ];
                     final pages = [
                       const MastersProductListPage(),
@@ -83,7 +83,7 @@ class _MastersMainPageState extends State<MastersMainPage> {
                       const MastersUserConfigurePage(),
                       const MastersVehicleManagementPage(),
                       const MastersCustomerPage(),
-                      GeneralSettingsPage(),
+                      // GeneralSettingsuPage(),
                     ];
                     return Padding(
                       padding: const EdgeInsets.all(4.0),

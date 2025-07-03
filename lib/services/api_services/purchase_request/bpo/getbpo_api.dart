@@ -7,14 +7,13 @@ import 'package:easy_stock_app/utils/token_manager/token_manager.dart';
 import 'package:easy_stock_app/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
-
 Future<String> fetchPurchaseOrderBPO() async {
   TokenManager tokenObj = TokenManager();
   var _accessToken = await tokenObj.getAccessToken();
   log("get bpo api");
 
   final url = Uri.parse(getPurchaseOrderRoute);
-  log( getPurchaseOrderRoute);
+  log(getPurchaseOrderRoute);
   Map<String, String>? headers = {
     'Content-Type': 'application/json',
     'XApiKey': apiKey,
@@ -24,12 +23,10 @@ Future<String> fetchPurchaseOrderBPO() async {
   final response = await http.get(url, headers: headers);
 
   if (response.statusCode == 200) {
-      print("response:${response.body.toString()}");
+    log("response   88968ret7w :${response.body.toString()}");
     return response.body.toString();
   } else {
     print('Failed to load Purchase Order BPO ${response.statusCode}');
     return 'Failed';
   }
 }
-
-

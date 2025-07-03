@@ -9,44 +9,58 @@ import 'package:easy_stock_app/view/masters/user_configure/user_configure_widget
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserMasterEditPage extends StatelessWidget {
-  User data;
-  List<UserCategory>category;
-  UserMasterEditPage({super.key, required this.data,required this.category});
+class UserMasterEditPage extends StatefulWidget {
+  final User data;
+  final List<UserCategory> category;
 
+  const UserMasterEditPage(
+      {super.key, required this.data, required this.category});
+
+  @override
+  State<UserMasterEditPage> createState() => _UserMasterEditPageState();
+}
+
+class _UserMasterEditPageState extends State<UserMasterEditPage> {
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     final userconfigure_provider = Provider.of<UserConfigureProvider>(context);
-    return Scaffold(
-      body: Stack(
-        children: [
-          BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "Edit User"),
-          ),
-          Padding(
-            padding:
-                EdgeInsets.only(top: screenHeight * 0.142, left: 15, right: 15),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Visibility(
+
+    return WillPopScope(
+      onWillPop: () async {
+        // Refresh data before popping
+        await userconfigure_provider.fetchData();
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            BackgroundImageWidget(image: common_backgroundImage),
+            Positioned(
+              top: screenHeight * 0.06,
+              left: screenWidth * 0.02,
+              right: screenWidth * 0.02,
+              child: CustomAppBar(txt: "Edit User"),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: screenHeight * 0.142, left: 15, right: 15),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Visibility(
                       visible: userconfigure_provider.selectedIndex == 0,
                       child: EditUserWidget(
-                        data: data,
-                        category:category
-                      )),
-                ],
+                          data: widget.data, category: widget.category),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

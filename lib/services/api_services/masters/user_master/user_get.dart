@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:easy_stock_app/utils/constants/api_key.dart';
 import 'package:easy_stock_app/utils/urls.dart';
@@ -5,8 +6,8 @@ import 'package:http/http.dart' as http;
 
 Future<String> getUserMaster() async {
   // Define the API URL
-    // Define the API URL
-   var accessToken = await getToken();  // Make sure to await the Future result
+  // Define the API URL
+  var accessToken = await getToken(); // Make sure to await the Future result
   final bearerToken = "Bearer " "$accessToken";
   final url = Uri.parse(getUserMasterRoute);
 
@@ -28,7 +29,7 @@ Future<String> getUserMaster() async {
       print('Response Data: ${response.body}');
       return data.toString();
     } else {
-      print('Request failed with status: ${response.statusCode},${response.body}');
+      log('Request failed with status------->>.....: ${response.statusCode},${response.body}');
       return 'Failed';
     }
   } catch (error) {

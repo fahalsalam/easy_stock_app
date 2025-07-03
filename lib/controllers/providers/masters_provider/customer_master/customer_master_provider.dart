@@ -35,8 +35,13 @@ class CustomerManagementProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  initializeData(String Id, String Code, String Name, String group, String city,
-     ) {
+  initializeData(
+    String Id,
+    String Code,
+    String Name,
+    String group,
+    String city,
+  ) {
     editcustomerCodeController.text = Code;
     editcustomerIdController.text = Id;
     editcustomerNameController.text = Name;
@@ -75,12 +80,14 @@ class CustomerManagementProvider with ChangeNotifier {
       notifyListeners();
       return;
     }
+    setLoading(false);
+    notifyListeners();
   }
 
   initiliseData() {}
-  Future<void> CustomerSave(BuildContext context,vehicleIds) async {
+  Future<void> CustomerSave(BuildContext context, vehicleIds) async {
     setLoading(true);
-log('ids: ${vehicleIds}');
+    log('ids: ${vehicleIds}');
     // Log the input fields for debugging
     log("Vehicle ID: ${vehicleId_controller.text}");
     log("Customer Name: ${customerName.text}");
@@ -107,13 +114,10 @@ log('ids: ${vehicleIds}');
 
     try {
       // Call the API with customer details
-      var res = await customerPostAPI(
-        customerID.text,
-        customerName.text,
-        customerGroup.text,
-        customerCity.text,vehicleIds
-        // vehicleId_controller.text,
-      );
+      var res = await customerPostAPI(customerID.text, customerName.text,
+          customerGroup.text, customerCity.text, vehicleIds
+          // vehicleId_controller.text,
+          );
 
       if (res != 'Failed') {
         clearAll();
@@ -122,6 +126,7 @@ log('ids: ${vehicleIds}');
       } else {
         showSnackBar(context, "Please try again!", "Error", Colors.red);
       }
+      await fetchData();
     } catch (e) {
       print("Exception caught: $e");
       showSnackBar(
@@ -131,43 +136,7 @@ log('ids: ${vehicleIds}');
     }
   }
 
-//   CustomerSave(context) async {
-//     setLoading(true);
-//     log("------->>>>>>>${vehicleId_controller.text}");
-//     log("name: ${customerName.text}");
-//     log("id: ${customerID.text}");
-//     log("group: ${customerGroup.text}");
-//     log("city: ${customerCity.text}");
-
-//     await Future.delayed(const Duration(seconds: 1));
-//     if (customerName.text.isNotEmpty || customerID.text.isNotEmpty) {
-//       try {
-//         {
-//           var res = await customerPostAPI(customerID.text, customerName.text,
-//               customerGroup.text, customerCity.text, vehicleId_controller.text);
-//           if (res != 'Failed') {
-//             clearAll();
-//             Navigator.pop(context);
-//             showSnackBar(context, "Customer Added", "Added", Colors.white);
-//           } else {
-//             showSnackBar(context, "Please try again!", "Error", Colors.red);
-//           }
-//         }
-//       } catch (e) {
-//         print("caught exception $e");
-//       }
-//     }else{
-//        if (customerName.text.isEmpty){
-//  showSnackBarWithsub(context, "Please Enter Customer Name", "Error", Colors.red);
-//        }
-//        else if(customerID.text.isEmpty){
-//  showSnackBarWithsub(context, "Please Enter Customer ID", "Error", Colors.red);
-//        }
-//     }
-//     setLoading(false);
-//   }
-
-  customerEdit(context,Set<int> selectedVehicles) async {
+  customerEdit(context, Set<int> selectedVehicles) async {
     setLoading(true);
 
     await Future.delayed(const Duration(seconds: 1));
@@ -200,7 +169,7 @@ log('ids: ${vehicleIds}');
             customerName: editcustomerNameController.text,
             group: editcustomerGroupController.text,
             city: editcustomerCityController.text,
-            vehicleIds:selectedVehicles,
+            vehicleIds: selectedVehicles,
             //  editvehicleIDController.text,
             customerID: editcustomerIdController.text,
           );

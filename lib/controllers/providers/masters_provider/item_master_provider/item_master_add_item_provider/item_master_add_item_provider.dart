@@ -20,7 +20,7 @@ class ProductMasterProvider with ChangeNotifier {
   TextEditingController itemNameController = TextEditingController();
   TextEditingController itemCodeController = TextEditingController();
   TextEditingController barcodeController = TextEditingController();
-  TextEditingController priceController = TextEditingController();
+  TextEditingController priceController = TextEditingController(text: "0");
   TextEditingController categoryController = TextEditingController();
   TextEditingController taxController = TextEditingController();
   TextEditingController uomController = TextEditingController();
@@ -34,15 +34,18 @@ class ProductMasterProvider with ChangeNotifier {
     isLodaing = value;
     notifyListeners();
   }
-initializeData(){
-  itemNameController.clear();
-  itemCodeController.clear();
- barcodeController.clear();
-  priceController.clear();
-  categoryController.clear();
-  taxController.clear();
-  uomController.clear();
-}
+
+  initializeData() {
+    itemNameController.clear();
+    itemCodeController.clear();
+    barcodeController.clear();
+    priceController.clear();
+    priceController.text = "0";
+    categoryController.clear();
+    taxController.clear();
+    uomController.clear();
+  }
+
 // add function
   addFunction(context, String imageurl) async {
     setLoading(true);
@@ -97,6 +100,7 @@ initializeData(){
     itemCodeController.clear();
     itemNameController.clear();
     priceController.clear();
+    priceController.text = "0";
     categoryController.clear();
     taxController.clear();
     uomController.clear();

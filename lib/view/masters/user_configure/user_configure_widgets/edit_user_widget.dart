@@ -1,14 +1,12 @@
-import 'dart:developer';
+import 'package:easy_stock_app/controllers/providers/masters_provider/vehicle_management_provider/vehicle_management_provider.dart';
 import 'package:easy_stock_app/utils/constants/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_stock_app/controllers/providers/masters_provider/customer_master/customer_master_provider.dart';
 import 'package:easy_stock_app/controllers/providers/masters_provider/user_configure_provider/userEdit_provider.dart';
 import 'package:easy_stock_app/models/masters/user_master/user_model.dart';
-import 'package:easy_stock_app/utils/common_widgets/dropdown_widget.dart';
 import 'package:easy_stock_app/utils/common_widgets/smackbar.dart';
 import 'package:easy_stock_app/utils/common_widgets/yesnoAlertbox.dart';
-import 'package:easy_stock_app/view/masters/customer/customer_widgets/customer_textfield_widget.dart';
 import 'package:easy_stock_app/view/masters/item_master/add_item/add_item_widget/gradient_button.dart';
 import 'package:easy_stock_app/view/masters/user_configure/user_configure_widgets/checkbox_widget.dart';
 
@@ -28,62 +26,105 @@ class _EditUserWidgetState extends State<EditUserWidget> {
 
   void _showUpdatePasswordDialog(BuildContext context) {
     final TextEditingController passwordController = TextEditingController();
+    final editUserProvider =
+        Provider.of<UserEditProvider>(context, listen: false);
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(backgroundColor:Colors.black,
-          title: const Text(
-            "Update Password",
-            style: TextStyle(fontSize: 15,color: Colors.white),
-          ),
-          content: TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              hintText: "Enter new password",
-              border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-              },
-              child: const Text("Cancel",style: TextStyle(color: primaryColor),),
-            ),
-            gradientElevatedButton(
-              child: Center(
-                child: const Text(
-                  "Save",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.black,
+              title: const Text(
+                "Update Password",
+                style: TextStyle(fontSize: 15, color: Colors.white),
+              ),
+              content: TextField(
+                controller: passwordController,
+                obscureText: !editUserProvider.isShowPassword,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "Enter new password",
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      editUserProvider.isShowPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.white54,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        editUserProvider.togglePasswordVisibility();
+                      });
+                    },
                   ),
                 ),
               ),
-              onPressed: () {},
-              width: MediaQuery.of(context).size.width * 0.23,
-              height: MediaQuery.of(context).size.height * 0.04,
-            ),
-            // ElevatedButton(
-
-            //   onPressed: () {
-            //     String newPassword = passwordController.text;
-            //     if (newPassword.isNotEmpty) {
-            //       // Handle password update logic here
-            //       ScaffoldMessenger.of(context).showSnackBar(
-            //         const SnackBar(
-            //             content: Text("Password updated successfully!")),
-            //       );
-            //       Navigator.pop(context);
-            //     }
-            //   },
-            //   child: const Text("Change Password"),
-            // ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: primaryColor),
+                  ),
+                ),
+                gradientElevatedButton(
+                  child: Center(
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    String newPassword = passwordController.text;
+                    if (newPassword.isNotEmpty) {
+                      await editUserProvider.updatePassword(newPassword);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        showSnackBarWithsub(
+                          context,
+                          "Password updated successfully!",
+                          "Success",
+                          Colors.green,
+                        );
+                      }
+                    } else {
+                      if (context.mounted) {
+                        showSnackBarWithsub(
+                          context,
+                          "Please enter a password",
+                          "Error",
+                          Colors.red,
+                        );
+                      }
+                    }
+                  },
+                  width: MediaQuery.of(context).size.width * 0.23,
+                  height: MediaQuery.of(context).size.height * 0.04,
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -95,7 +136,8 @@ class _EditUserWidgetState extends State<EditUserWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CustomerManagementProvider>(context, listen: false)
           .fetchData();
-
+      Provider.of<VehicleManagementProvider>(context, listen: false)
+          .fetchData();
       final editUserProvider =
           Provider.of<UserEditProvider>(context, listen: false);
       editUserProvider.initializeData(widget.data, widget.category);
@@ -121,205 +163,663 @@ class _EditUserWidgetState extends State<EditUserWidget> {
     var screenWidth = MediaQuery.of(context).size.width;
     final editUserProvider = Provider.of<UserEditProvider>(context);
     final customerProvider = Provider.of<CustomerManagementProvider>(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: screenHeight * .015),
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 25),
-          child: Text(
-            "Details",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
+    final userConfigureProvider = Provider.of<UserEditProvider>(context);
+    final vehicleManagementProvider =
+        Provider.of<VehicleManagementProvider>(context);
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          width: screenWidth * 0.95,
+          margin: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ),
-        SizedBox(height: screenHeight * .01),
-        Center(
-          child: Container(
-            width: screenWidth * 0.9,
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title
+              const Row(
                 children: [
-                  buildUserTextField(
-                    "User Code",
-                    editUserProvider.editUserCodeController,
-                    screenWidth,
-                  ),
-                  buildUserTextField(
-                    "Name",
-                    editUserProvider.editUserNameController,
-                    screenWidth,
-                  ),
-                  const SizedBox(height: 15),
-                  buildAutoCompleteField(
-                    hintText: editUserProvider.customerName.isEmpty
-                        ? 'Select Customer'
-                        : editUserProvider.customerName,
-                    controller: customerProvider.customer_controller,
-                    suggestionsCallback: (query) async {
-                      return customerProvider.customers;
-                    },
-                    onSuggestionSelected: (suggestion) {
-                      customerProvider.customer_controller.text =
-                          suggestion['name'];
-                      editUserProvider.customerID = suggestion['id'];
-                      editUserProvider.customerName = suggestion['name'];
-                      log("Selected Customer: ${suggestion['id']}, ${suggestion['name']}");
-                    },
-                  ),
-                  const SizedBox(height: 15),
-                  GestureDetector(
-                    onTap: () {
-                      _showUpdatePasswordDialog(context);
-                    },
-                    child: Container(
-                      height: screenHeight * 0.05,
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          border: Border.all(color: Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: const Center(
-                        child: Text(
-                          "Update Password ",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
+                  Icon(Icons.edit, color: primaryColor, size: 28),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Edit User",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isCategoryVisible = !isCategoryVisible;
-                      });
-                    },
-                    child: Container(
-                      height: screenHeight * 0.05,
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          border: Border.all(color: Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: const Center(
-                        child: Text(
-                          "Select Categories ",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                  ),
-                  isCategoryVisible
-                      ? Container(
-                          height: screenHeight * 0.2,
-                          color: Colors.black,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.only(bottom: 15, top: 5),
-                            itemCount: editUserProvider.categoryList.length,
-                            itemBuilder: (context, index) {
-                              final data = editUserProvider.categoryList[index];
-
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    if (mappedCategories.any((category) =>
-                                        category['id'] == data['id'])) {
-                                      mappedCategories.removeWhere((category) =>
-                                          category['id'] == data['id']);
-                                    } else {
-                                      mappedCategories.add({
-                                        "id": data['id'],
-                                        "name": data['name'],
-                                      });
-                                    }
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: getCategoryColor(data['id']),
-                                        border: Border.all(
-                                            color: Colors.grey.shade200),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          data['name'],
-                                          style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : Container(),
                 ],
               ),
-            ),
+              const SizedBox(height: 18),
+              // Section: User Details
+              const Text(
+                "User Details",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _modernTextField(
+                label: "User Code",
+                controller: editUserProvider.editUserCodeController,
+                icon: Icons.badge_outlined,
+                isPassword: false,
+              ),
+              const SizedBox(height: 14),
+              _modernTextField(
+                label: "Name",
+                controller: editUserProvider.editUserNameController,
+                icon: Icons.person_outline,
+                isPassword: false,
+              ),
+              const SizedBox(height: 14),
+              GestureDetector(
+                onTap: () {
+                  _showUpdatePasswordDialog(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white24, width: 1),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        "Update Password",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Icon(Icons.lock_outline, color: Colors.white54),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              // Section: Customer
+              const Text(
+                "Customer",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Customer Selection Section
+              Visibility(
+                visible: !userConfigureProvider.isDriver,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Default Customer",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            TextEditingController searchController =
+                                TextEditingController();
+                            List customers = customerProvider.customers;
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                List filteredCustomers = customers
+                                    .where((c) => c['name']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(searchController.text
+                                            .toLowerCase()))
+                                    .toList();
+                                return Container(
+                                  height: screenHeight * 0.7,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.9),
+                                    borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(20)),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      TextField(
+                                        controller: searchController,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: "Search customers...",
+                                          hintStyle: TextStyle(
+                                              color: Colors.white
+                                                  .withOpacity(0.5)),
+                                          prefixIcon: const Icon(Icons.search,
+                                              color: Colors.white54),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.white24),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.white24),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide:
+                                                BorderSide(color: primaryColor),
+                                          ),
+                                        ),
+                                        onChanged: (_) => setModalState(() {}),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: filteredCustomers.length,
+                                          itemBuilder: (context, index) {
+                                            final customer =
+                                                filteredCustomers[index];
+                                            return ListTile(
+                                              title: Text(
+                                                customer['name'],
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              onTap: () {
+                                                customerProvider
+                                                    .customer_controller
+                                                    .text = customer['name'];
+                                                editUserProvider.customerID =
+                                                    customer['id'];
+                                                editUserProvider.customerName =
+                                                    customer['name'];
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white24, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                editUserProvider.customerName.isEmpty
+                                    ? 'Select Customer'
+                                    : editUserProvider.customerName,
+                                style: TextStyle(
+                                  color: editUserProvider.customerName.isEmpty
+                                      ? Colors.white54
+                                      : Colors.white,
+                                  fontSize: 15,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            const Icon(Icons.keyboard_arrow_down_rounded,
+                                color: Colors.white54),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              // Vehicle Selection Section
+              Visibility(
+                visible: userConfigureProvider.isDriver,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Vehicle",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            TextEditingController searchController =
+                                TextEditingController();
+                            List vehicles = vehicleManagementProvider.vehicles;
+                            String selectedId =
+                                editUserProvider.selectedVehicleId ?? '';
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                List filteredVehicles = vehicles
+                                    .where((v) => v['name']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(searchController.text
+                                            .toLowerCase()))
+                                    .toList();
+                                return Container(
+                                  height: screenHeight * 0.7,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.9),
+                                    borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(20)),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      TextField(
+                                        controller: searchController,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: "Search vehicles...",
+                                          hintStyle: TextStyle(
+                                              color: Colors.white
+                                                  .withOpacity(0.5)),
+                                          prefixIcon: const Icon(Icons.search,
+                                              color: Colors.white54),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.white24),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                                color: Colors.white24),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide:
+                                                BorderSide(color: primaryColor),
+                                          ),
+                                        ),
+                                        onChanged: (_) => setModalState(() {}),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: filteredVehicles.length,
+                                          itemBuilder: (context, index) {
+                                            final vehicle =
+                                                filteredVehicles[index];
+                                            return RadioListTile<String>(
+                                              value: vehicle['id'].toString(),
+                                              groupValue: selectedId,
+                                              onChanged: (val) {
+                                                setModalState(() {
+                                                  selectedId = val!;
+                                                });
+                                                editUserProvider
+                                                    .selectedVehicles(
+                                                        selectedId);
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              },
+                                              title: Text(
+                                                vehicle['name'],
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              activeColor: primaryColor,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white24, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                editUserProvider.selectedVehicleId == null
+                                    ? 'Select Vehicle'
+                                    : vehicleManagementProvider.vehicles
+                                        .firstWhere((v) =>
+                                            v['id'].toString() ==
+                                            editUserProvider
+                                                .selectedVehicleId)['name'],
+                                style: TextStyle(
+                                  color:
+                                      editUserProvider.selectedVehicleId == null
+                                          ? Colors.white54
+                                          : Colors.white,
+                                  fontSize: 15,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            const Icon(Icons.keyboard_arrow_down_rounded,
+                                color: Colors.white54),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+// Section: Categories
+              const Text(
+                "Categories",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Category Selection as Bottom Sheet (already implemented)
+              GestureDetector(
+                onTap: () async {
+                  await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      TextEditingController searchController =
+                          TextEditingController();
+                      List categories = editUserProvider.categoryList;
+                      List selectedIds = List<String>.from(
+                        mappedCategories.map((cat) => cat['id'].toString()),
+                      );
+                      return StatefulBuilder(
+                        builder: (context, setModalState) {
+                          List filteredCategories = categories
+                              .where((c) => c['name']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(
+                                      searchController.text.toLowerCase()))
+                              .toList();
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.7,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 45,
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: TextField(
+                                    controller: searchController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      hintText: 'Search categories...',
+                                      hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.5)),
+                                      border: InputBorder.none,
+                                      prefixIcon: Icon(Icons.search,
+                                          color: Colors.white.withOpacity(0.5)),
+                                    ),
+                                    onChanged: (_) => setModalState(() {}),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: filteredCategories.length,
+                                    itemBuilder: (context, index) {
+                                      final category =
+                                          filteredCategories[index];
+                                      final isSelected = selectedIds
+                                          .contains(category['id'].toString());
+                                      return CheckboxListTile(
+                                        value: isSelected,
+                                        onChanged: (val) {
+                                          setModalState(() {
+                                            if (val == true) {
+                                              selectedIds.add(
+                                                  category['id'].toString());
+                                            } else {
+                                              selectedIds.remove(
+                                                  category['id'].toString());
+                                            }
+                                          });
+                                        },
+                                        title: Text(
+                                          category['name'],
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        activeColor: primaryColor,
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    // Update mappedCategories
+                                    setState(() {
+                                      mappedCategories = categories
+                                          .where((cat) => selectedIds
+                                              .contains(cat['id'].toString()))
+                                          .map<Map<String, String>>((cat) => {
+                                                'id': cat['id'].toString(),
+                                                'name': cat['name'],
+                                              })
+                                          .toList();
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("Done",
+                                      style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white24, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          mappedCategories.isEmpty
+                              ? 'Select Categories'
+                              : mappedCategories
+                                  .map((cat) => cat['name'])
+                                  .join(', '),
+                          style: TextStyle(
+                            color: mappedCategories.isEmpty
+                                ? Colors.white54
+                                : Colors.white,
+                            fontSize: 15,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      const Icon(Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white54),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              // Section: Menu Selection
+              const Text(
+                "Menu Selection",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              buildUserMenuSelection(
+                  screenHeight, screenWidth, editUserProvider),
+              const SizedBox(height: 28),
+              // Save Button
+              buildSaveButton(screenHeight, screenWidth, editUserProvider),
+            ],
           ),
         ),
-        SizedBox(height: screenHeight * 0.02),
-        buildUserMenuSelection(screenHeight, screenWidth, editUserProvider),
-        SizedBox(height: screenHeight * 0.01),
-        buildSaveButton(screenHeight, screenWidth, editUserProvider),
-        SizedBox(height: screenHeight * 0.01),
-      ],
+      ),
     );
   }
 
-  Widget buildUserTextField(
-      String label, TextEditingController controller, double screenWidth) {
-    return Row(
+  Widget _modernTextField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: screenWidth * 0.2,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white70,
+              ),
             ),
-          ),
+          ],
         ),
-        Expanded(
-          child: CustomerTextfield(
-            controller: controller,
-            txt: "",
-            color: Colors.grey.withOpacity(0.2),
-            hintText: "",
-            suffixIcon: const Icon(
-              Icons.visibility,
-              size: 18,
-              color: Colors.transparent,
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          obscureText: isPassword,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.08),
+            prefixIcon: Icon(icon, color: Colors.white54),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.white24, width: 1),
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: primaryColor, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           ),
         ),
       ],
@@ -402,6 +902,25 @@ class _EditUserWidgetState extends State<EditUserWidget> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         gradientElevatedButton(
+          onPressed: () {
+            yesnoAlertDialog(
+              context: context,
+              message: "Do you want to save the changes?",
+              screenHeight: screenHeight,
+              screenWidth: screenWidth,
+              onNo: () {
+                Navigator.pop(context);
+              },
+              onYes: () async {
+                Navigator.pop(context); // Close the alert dialog
+                await provider.userEdit(context, mappedCategories);
+              },
+              buttonNoText: "Cancel",
+              buttonYesText: "Save",
+            );
+          },
+          width: screenWidth * 0.23,
+          height: screenHeight * 0.04,
           child: Center(
             child: provider.isLoading
                 ? const Padding(
@@ -420,55 +939,6 @@ class _EditUserWidgetState extends State<EditUserWidget> {
                     ),
                   ),
           ),
-          onPressed: () {
-            if (provider.editUserCodeController.text.isEmpty) {
-              showSnackBarWithsub(
-                context,
-                "Please Enter User Code",
-                "Error",
-                Colors.red,
-              );
-
-              return; // Exit early if validation fails
-            }
-            if (provider.editUserNameController.text.isEmpty) {
-              showSnackBarWithsub(
-                context,
-                "Please Enter User Name",
-                "Error",
-                Colors.red,
-              );
-
-              return; // Exit early if validation fails
-            }
-            // if (provider.mappedCategories.isEmpty) {
-            //   showSnackBarWithsub(
-            //     context,
-            //     "Please select category",
-            //     "Error",
-            //     Colors.red,
-            //   );
-
-            //   return; // Exit early if validation fails
-            // }
-            yesnoAlertDialog(
-              context: context,
-              message: "Do you want to save?",
-              screenHeight: screenHeight,
-              screenWidth: screenWidth,
-              onNo: () {
-                Navigator.pop(context);
-              },
-              onYes: () {
-                provider.userEdit(context, mappedCategories);
-                Navigator.pop(context);
-              },
-              buttonNoText: "No",
-              buttonYesText: "Yes",
-            );
-          },
-          width: screenWidth * 0.23,
-          height: screenHeight * 0.04,
         ),
       ],
     );

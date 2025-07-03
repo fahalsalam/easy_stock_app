@@ -67,16 +67,16 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
     }
 
     // **Company Header**
-    bytes += generator.text(
-      '${centerText('$leftMargin${widget.header.printHeader}')}',
-      styles: const PosStyles(height: PosTextSize.size2, bold: true),
-    );
-    bytes += generator.text(centerText(
-        '$leftMargin${widget.header.state}, ${widget.header.country}'));
-    bytes += generator
-        .text(centerText('$leftMargin TRN NO: ${widget.header.trnNo}'));
-    bytes += generator.text(centerText(
-        '$leftMargin${'-' * (totalWidth - leftMarginSpaces)}')); // Divider line
+    // bytes += generator.text(
+    //   '${centerText('$leftMargin${widget.header.printHeader}')}',
+    //   styles: const PosStyles(height: PosTextSize.size2, bold: true),
+    // );
+    // bytes += generator.text(centerText(
+    //     '$leftMargin${widget.header.state}, ${widget.header.country}'));
+    // bytes += generator
+    //     .text(centerText('$leftMargin TRN NO: ${widget.header.trnNo}'));
+    // bytes += generator.text(centerText(
+    //     '$leftMargin${'-' * (totalWidth - leftMarginSpaces)}')); // Divider line
 
     // **Centered TAX INVOICE Title**
     bytes += generator.text(
@@ -94,15 +94,15 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
         '$leftMargin${'-' * (totalWidth - leftMarginSpaces)}'); // Divider line
 
     // **Column Headers with Proper Spacing**
-       int snoWidth = 5;       // S.No width
-  int nameWidth = 20;
+    int snoWidth = 5; // S.No width
+    int nameWidth = 20;
     int qtyWidth = 16; //7 Quantity
     int rateWidth = 10; // Rate
     int amountWidth = 14; // Amount
 
-    String headers ='$leftMargin${'S.No'.padRight(snoWidth)}'
-     '$leftMargin${'ITEM'.padRight(nameWidth)}'
-     '${'UNIT'.padLeft(qtyWidth)}'
+    String headers = '$leftMargin${'S.No'.padRight(snoWidth)}'
+        '$leftMargin${'ITEM'.padRight(nameWidth)}'
+        '${'UNIT'.padLeft(qtyWidth)}'
         '${'QTY'.padLeft(qtyWidth)}'
         // '${'RATE'.padLeft(rateWidth)}'
         // '${'VAT'.padLeft(rateWidth)}'
@@ -114,21 +114,20 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
         '$leftMargin${'-' * (totalWidth - leftMarginSpaces)}'); // Line separator
 
     // **Print Items with Proper Spacing**
-     for (int i = 0; i < widget.dataList.length; i++) {
-    var item = widget.dataList[i];
-    double total = double.parse(item.price) * double.parse(item.qty);
-    String serial = (i + 1).toString().padRight(snoWidth);
+    for (int i = 0; i < widget.dataList.length; i++) {
+      var item = widget.dataList[i];
+      double total = double.parse(item.price) * double.parse(item.qty);
+      String serial = (i + 1).toString().padRight(snoWidth);
 
-    bytes += generator.text(
-      '$leftMargin$serial'
-      '${item.productName.padRight(nameWidth)}'
-      '${double.parse(item.qty).toStringAsFixed(2).padLeft(qtyWidth)}'
-      '${double.parse(item.price).toStringAsFixed(2).padLeft(rateWidth)}'
-      '${total.toStringAsFixed(2).padLeft(amountWidth)}'
-    );
+      bytes += generator.text('$leftMargin$serial'
+          '${item.productName.padRight(nameWidth)}'
+          '${double.parse(item.qty).toStringAsFixed(2).padLeft(qtyWidth)}'
+          '${double.parse(item.price).toStringAsFixed(2).padLeft(rateWidth)}'
+          '${total.toStringAsFixed(2).padLeft(amountWidth)}');
 
-    bytes += generator.text('$leftMargin${'-' * (totalWidth - leftMarginSpaces)}');
-  }
+      bytes +=
+          generator.text('$leftMargin${'-' * (totalWidth - leftMarginSpaces)}');
+    }
     // for (var item in widget.dataList) {
     //   double total = double.parse(item.price) * double.parse(item.qty);
 
@@ -154,11 +153,11 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
     // double vat = _calculateSubTotal() * 0.05; // Example: 5% VAT
     double grandTotal = _calculateSubTotal();
     // ; + vat;
-    double totalQty=_calculateQtyTotal();
+    double totalQty = _calculateQtyTotal();
     // bytes += generator
     //     .text(rightAlignText('Total VAT: ${vat.toStringAsFixed(2)} AED'));
     bytes += generator.text(
-      rightAlignText('Total Qty: ${ totalQty.toStringAsFixed(2)}'),
+      rightAlignText('Total Qty: ${totalQty.toStringAsFixed(2)}'),
       styles: const PosStyles(
         height: PosTextSize.size2,
         bold: true,
@@ -177,7 +176,6 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
     bytes += generator.cut();
     return bytes;
   }
-
 
   Future<void> scanAndPrint(BuildContext context) async {
     // Scan for paired Bluetooth devices
@@ -304,32 +302,32 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
                         mainAxisAlignment: pw.MainAxisAlignment.center,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text(widget.header.printHeader,
-                              style: pw.TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: pw.FontWeight.bold)),
+                          // pw.Text(widget.header.printHeader,
+                          //     style: pw.TextStyle(
+                          //         fontSize: 18,
+                          //         fontWeight: pw.FontWeight.bold)),
                         ]),
-                    pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.center,
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                              '${widget.header.state},${widget.header.country}',
-                              style: pw.TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: pw.FontWeight.bold)),
-                        ]),
+                    // pw.Row(
+                    //     mainAxisAlignment: pw.MainAxisAlignment.center,
+                    //     crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    //     children: [
+                    //       pw.Text(
+                    //           '${widget.header.state},${widget.header.country}',
+                    //           style: pw.TextStyle(
+                    //               fontSize: 18,
+                    //               fontWeight: pw.FontWeight.bold)),
+                    //     ]),
 
-                    pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.center,
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text('TRN NO: ${widget.header.trnNo}',
-                              style: pw.TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: pw.FontWeight.bold)),
-                        ]),
-                    pw.SizedBox(height: 20),
+                    // pw.Row(
+                    //     mainAxisAlignment: pw.MainAxisAlignment.center,
+                    //     crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    //     children: [
+                    //       pw.Text('TRN NO: ${widget.header.trnNo}',
+                    //           style: pw.TextStyle(
+                    //               fontSize: 18,
+                    //               fontWeight: pw.FontWeight.bold)),
+                    //     ]),
+                    // pw.SizedBox(height: 20),
 
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -382,7 +380,7 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
                     children: [
                       pw.TableRow(
                         children: [
-                           pw.Padding(
+                          pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text('S.No',
                                 style: pw.TextStyle(
@@ -486,7 +484,8 @@ class _CompletedInvoicePageState extends State<LpoinvoicePage> {
                             // pw.Text(
                             //     'Total Vat: ${totalVat.toStringAsFixed(2)} AED'),
                             pw.SizedBox(height: 5),
-                            pw.Text('Total Quantity:${totalQty.toStringAsFixed(2)}',
+                            pw.Text(
+                                'Total Quantity:${totalQty.toStringAsFixed(2)}',
                                 //  ${((subTotal) + (totalVat)).toStringAsFixed(2)} AED',
                                 style: pw.TextStyle(
                                     fontWeight: pw.FontWeight.bold)),

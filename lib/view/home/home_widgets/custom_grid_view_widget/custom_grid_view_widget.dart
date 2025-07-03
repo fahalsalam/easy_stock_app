@@ -6,7 +6,7 @@ import 'package:easy_stock_app/view/purchase/purchase_mainmenu/purchase_main_men
 import 'package:easy_stock_app/view/purchase_request/purchase_request_mainmenu/purchase_request_mainmenu.dart';
 import 'package:easy_stock_app/view/purchase_request/vehicle_details/vehicle_list_page/vehicle_list_page.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:developer' as developer;
 
 class CustomGridView extends StatefulWidget {
   const CustomGridView({
@@ -19,6 +19,17 @@ class CustomGridView extends StatefulWidget {
 
 class _CustomGridViewState extends State<CustomGridView> {
   bool isLoading = true;
+  String? errorMessage;
+
+  // Helper method to validate boolean string
+  bool _isValidBoolean(String value) {
+    return value.toLowerCase() == 'true' || value.toLowerCase() == 'false';
+  }
+
+  // Helper method to get boolean value
+  bool _getBooleanValue(String value) {
+    return value.toLowerCase() == 'true';
+  }
 
   @override
   void initState() {
@@ -27,78 +38,270 @@ class _CustomGridViewState extends State<CustomGridView> {
   }
 
   Future<void> fetchMenuValues() async {
-    // await Future.delayed(Duration(seconds: 2));
-    if (isMaster != "" && isOrder != "" && isPurchase != ""&&isDriver!="")
-      setState(() {
-        isLoading = false;
-      });
+    try {
+      // Log menu visibility status
+      developer.log('Menu Visibility Status:', name: 'MenuList');
+      developer.log('isMasters: $isMaster', name: 'MenuList');
+      developer.log('isConsolidatedPurchase: $isOrder', name: 'MenuList');
+      developer.log('isPurchaseRequest: $isPurchase', name: 'MenuList');
+      developer.log('isDriver: $isDriver', name: 'MenuList');
+
+      // Validate all required values are present and valid
+      if (isMaster.isEmpty ||
+          isOrder.isEmpty ||
+          isPurchase.isEmpty ||
+          isDriver.isEmpty) {
+        throw Exception('Required menu configuration values are missing');
+      }
+
+      // Validate boolean values
+      if (!_isValidBoolean(isMaster) ||
+          !_isValidBoolean(isOrder) ||
+          !_isValidBoolean(isPurchase) ||
+          !_isValidBoolean(isDriver)) {
+        throw Exception('Invalid boolean values in menu configuration');
+      }
+
+      // Get boolean values
+      final bool isUserDriver = _getBooleanValue(isDriver);
+      final bool isMasters = _getBooleanValue(isMaster);
+      final bool isConsolidatedPurchase = _getBooleanValue(isOrder);
+      final bool isPurchaseRequest = _getBooleanValue(isPurchase);
+
+      // Determine which menus to show based on the rules
+      List<Map<String, dynamic>> items = [];
+
+      // Rule 1: If all are true, show all menus
+      if (isMasters && isConsolidatedPurchase && isPurchaseRequest) {
+        items = [
+          {
+            'image': purchase_request_image,
+            'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+            'title': 'Purchase Request',
+            'showItem': true,
+          },
+          {
+            'image': purchase_order_image,
+            'page': const PurchaseMainMenuPage(),
+            'title': 'Purchase Order',
+            'showItem': true,
+          },
+          {
+            'image': masters_image,
+            'page': const MastersMainPage(),
+            'title': 'Masters',
+            'showItem': true,
+          },
+        ];
+      }
+      // Rule 2: If only Consolidated Purchase is true, show Purchase Request
+      else if (isConsolidatedPurchase && !isMasters && !isPurchaseRequest) {
+        items = [
+          {
+            'image': purchase_request_image,
+            'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+            'title': 'Purchase Request',
+            'showItem': true,
+          },
+        ];
+      }
+      // Rule 3: If driver is true, show Vehicle Details
+      else if (isUserDriver) {
+        items = [
+          {
+            'image': vehicle_details_img,
+            'page': const VehicleListPage(),
+            'title': 'Vehicle Details',
+            'showItem': true,
+          },
+        ];
+      }
+      // Default case: Show menus based on individual flags
+      else {
+        items = [
+          if (isConsolidatedPurchase)
+            {
+              'image': purchase_request_image,
+              'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+              'title': 'Purchase Request',
+              'showItem': true,
+            },
+          if (isPurchaseRequest)
+            {
+              'image': purchase_order_image,
+              'page': const PurchaseMainMenuPage(),
+              'title': 'Purchase Order',
+              'showItem': true,
+            },
+          if (isMasters)
+            {
+              'image': masters_image,
+              'page': const MastersMainPage(),
+              'title': 'Masters',
+              'showItem': true,
+            },
+        ];
+      }
+
+      // Log menu items configuration
+      developer.log('Menu Items Configuration:', name: 'MenuList');
+      for (var item in items) {
+        developer.log('Item: ${item['title']}', name: 'MenuList');
+        developer.log('  - Page: ${item['page'].runtimeType}',
+            name: 'MenuList');
+        developer.log('  - Visible: ${item['showItem']}', name: 'MenuList');
+      }
+
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = null;
+        });
+      }
+    } catch (e) {
+      developer.log('Error in fetchMenuValues: $e', name: 'MenuList', error: e);
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Failed to load menu: ${e.toString()}';
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           color: Colors.white,
         ),
       );
     }
 
-    List<Map<String, dynamic>> items = [
-      {
-        'image': purchase_order_image,
-        'page': const PurchaseMainMenuPage(),
-        'title': 'Purchase Order',
-        'showItem': isOrder,
-      },
-      {
-        'image': isDriver.toLowerCase() == 'true'
-            ? vehicle_details_img
-            : purchase_request_image,
-        'page': isDriver.toLowerCase() == 'true'
-            ? const VehicleListPage()
-            : RequestMainMenu(
-                isDriver: 'false',
-              ),
-        'title': isDriver.toLowerCase() == 'true'
-            ? 'Vehicle Details'
-            : 'Purchase Request',
-        'showItem': isPurchase,
-      },
-      {
-        'image': masters_image,
-        'page': const MastersMainPage(),
-        'title': 'Masters',
-        'showItem': isMaster,
-      },
-      // {
-      //   'image': report_image,
-      //   'page': const ReportMainMenuPage(),
-      //   'title': 'Report',
-      //   'showItem': isMaster,
-      // },
-    ];
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              errorMessage!,
+              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: fetchMenuValues,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
 
-    List<Map<String, dynamic>> filteredList =
-        items.where((items) => items['showItem'] == 'true').toList();
+    // Get boolean values
+    final bool isUserDriver = _getBooleanValue(isDriver);
+    final bool isMasters = _getBooleanValue(isMaster);
+    final bool isConsolidatedPurchase = _getBooleanValue(isOrder);
+    final bool isPurchaseRequest = _getBooleanValue(isPurchase);
+
+    // Determine which menus to show based on the rules
+    List<Map<String, dynamic>> items = [];
+
+    // Rule 1: If all are true, show all menus
+    if (isMasters && isConsolidatedPurchase && isPurchaseRequest) {
+      items = [
+        {
+          'image': purchase_request_image,
+          'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+          'title': 'Purchase Request',
+          'showItem': true,
+        },
+        {
+          'image': purchase_order_image,
+          'page': const PurchaseMainMenuPage(),
+          'title': 'Purchase Order',
+          'showItem': true,
+        },
+        {
+          'image': masters_image,
+          'page': const MastersMainPage(),
+          'title': 'Masters',
+          'showItem': true,
+        },
+      ];
+    }
+    // Rule 2: If only Consolidated Purchase is true, show Purchase Request
+    else if (isConsolidatedPurchase && !isMasters && !isPurchaseRequest) {
+      items = [
+        {
+          'image': purchase_request_image,
+          'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+          'title': 'Purchase Request',
+          'showItem': true,
+        },
+      ];
+    }
+    // Rule 3: If driver is true, show Vehicle Details
+    else if (isUserDriver) {
+      items = [
+        {
+          'image': vehicle_details_img,
+          'page': const VehicleListPage(),
+          'title': 'Vehicle Details',
+          'showItem': true,
+        },
+      ];
+    }
+    // Default case: Show menus based on individual flags
+    else {
+      items = [
+        if (isConsolidatedPurchase)
+          {
+            'image': purchase_request_image,
+            'page': RequestMainMenu(isDriver: isUserDriver.toString()),
+            'title': 'Purchase Request',
+            'showItem': true,
+          },
+        if (isPurchaseRequest)
+          {
+            'image': purchase_order_image,
+            'page': const PurchaseMainMenuPage(),
+            'title': 'Purchase Order',
+            'showItem': true,
+          },
+        if (isMasters)
+          {
+            'image': masters_image,
+            'page': const MastersMainPage(),
+            'title': 'Masters',
+            'showItem': true,
+          },
+      ];
+    }
 
     return GridView.builder(
       padding: EdgeInsets.zero,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 16.0,
         mainAxisSpacing: 16.0,
         childAspectRatio: 6.6 / 7,
       ),
-      itemCount: filteredList.length,
+      itemCount: items.length,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => filteredList[index]['page']),
+              MaterialPageRoute(builder: (context) => items[index]['page']),
             );
           },
           child: ClipRRect(
@@ -121,7 +324,7 @@ class _CustomGridViewState extends State<CustomGridView> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
-                            filteredList[index]['image'],
+                            items[index]['image'],
                             height: 80,
                             width: 80,
                           ),
@@ -129,8 +332,8 @@ class _CustomGridViewState extends State<CustomGridView> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        filteredList[index]['title'],
-                        style: TextStyle(
+                        items[index]['title'],
+                        style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15,
                           color: Colors.white,

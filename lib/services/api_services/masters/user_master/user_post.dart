@@ -11,7 +11,10 @@ Future<String> postUserMaster(
     defaultCustomer,
     isPurchase,
     isMasters,
-    isConsolidate,isDriver,category}) async {
+    isConsolidate,
+    isDriver,
+    category,
+    vehicleID}) async {
   // Define the API URL
   var accessToken = await getToken(); // Make sure to await the Future result
   final bearerToken = "Bearer " + "$accessToken";
@@ -29,14 +32,15 @@ Future<String> postUserMaster(
     "UserCode": userCode,
     "UserName": userName,
     "PasswordHash": password,
-    "MappedCategory":category,
+    "MappedCategory": category,
     "DefaultCustomer": defaultCustomer,
-    "IsPurchaseRequest": isPurchase ,
-    "IsMasters": isMasters ,
-    "IsConsolidatedPurchase": isConsolidate ,
-    "IsDriver":isDriver 
+    "IsPurchaseRequest": isPurchase,
+    "IsMasters": isMasters,
+    "IsConsolidatedPurchase": isConsolidate,
+    "IsDriver": isDriver,
+    if (isDriver) "VehicleID": vehicleID
   };
-log("req:---------------------------------->>>>>>>  ${jsonEncode(body)}");
+  log("req:---------------------------------->>>>>>>  ${jsonEncode(body)}");
   try {
     // Make the POST request
     final response =

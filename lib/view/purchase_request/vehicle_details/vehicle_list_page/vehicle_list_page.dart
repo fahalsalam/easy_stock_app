@@ -17,6 +17,7 @@ class VehicleListPage extends StatefulWidget {
 
 class _VehicleListPageState extends State<VehicleListPage> {
   bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -36,198 +37,292 @@ class _VehicleListPageState extends State<VehicleListPage> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     final bpoVehicleProvider = Provider.of<BpoVehicleProvider>(context);
+
     return Scaffold(
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-            child: Column(
-              children: [
-                SizedBox(height: screenHeight * 0.06),
-                CustomAppBar(txt: "Vehicle Details"),
-                SizedBox(height: screenHeight * 0.02),
-                SizedBox(
-                  width: screenWidth * 0.88,
-                  child: const Text(
-                    "Choose a vehicle and check out the list of items  assigned to it, as well as the branch details.",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
+          Positioned(
+            top: screenHeight * 0.06,
+            left: screenWidth * 0.02,
+            right: screenWidth * 0.02,
+            child: CustomAppBar(txt: "Vehicle Details"),
+          ),
+          Positioned(
+            top: screenHeight * 0.13,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24, width: 1),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                isLoading
-                    ? SizedBox(
-                        height: screenHeight * 0.3,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_outlined,
+                            color: primaryColor,
+                            size: 18,
                           ),
                         ),
-                      )
-                    : Expanded(
-                        child: bpoVehicleProvider.data.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  "No data",
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Choose a vehicle and check out the list of items assigned to it, as well as the branch details.",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: isLoading
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const CircularProgressIndicator(
+                                  color: primaryColor,
+                                  strokeWidth: 2,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  "Loading vehicles...",
                                   style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 13,
                                   ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : bpoVehicleProvider.data.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.directions_car_outlined,
+                                      size: 48,
+                                      color: Colors.white.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "No Vehicles Found",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )
                             : ListView.builder(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                padding: const EdgeInsets.only(bottom: 16),
                                 itemCount: bpoVehicleProvider.data.length,
                                 itemBuilder: (context, index) {
                                   VehiclebybpoData vehicleData =
                                       bpoVehicleProvider.data[index];
+
+                                  if (vehicleData.vehicleId == 0) {
+                                    return const SizedBox.shrink();
+                                  }
+
                                   return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 12,
-                                          backgroundColor: primaryColor,
-                                          child: Text(
-                                            "${index + 1}",
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black,
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                VehicleDetailsPage(
+                                              driverName: vehicleData.driverName
+                                                  .toString(),
+                                              id: vehicleData.vehicleId
+                                                  .toString(),
                                             ),
                                           ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: Colors.white24, width: 1),
                                         ),
-                                        SizedBox(width: screenWidth * 0.02),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    VehicleDetailsPage(
-                                                  driverName: vehicleData
-                                                      .driverName
-                                                      .toString(),
-                                                  id: vehicleData.vehicleId
-                                                      .toString(),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 32,
+                                                width: 32,
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: screenHeight * 0.1,
-                                            width: screenWidth * 0.8,
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 15,
-                                                vertical: 10,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                        vehicleData.vehicleName,
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 1),
-                                                        child: Text(
-                                                          "Total Branches -${vehicleData.totalBranch}",
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 1),
-                                                        child: Text(
-                                                          "Total Items - ${vehicleData.totalItems}",
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const Spacer(),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              VehicleDetailsPage(
-                                                            driverName:
-                                                                vehicleData
-                                                                    .driverName
-                                                                    .toString(),
-                                                            id: vehicleData
-                                                                .vehicleId
-                                                                .toString(),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.visibility,
-                                                      size: 20,
-                                                      color: Colors.white,
+                                                child: Center(
+                                                  child: Text(
+                                                    "${index + 1}",
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black,
                                                     ),
                                                   ),
-                                                ],
+                                                ),
                                               ),
-                                            ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      vehicleData.vehicleName ??
+                                                          '',
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                          child: Text(
+                                                            "Branches: ${vehicleData.totalBranch}",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Colors
+                                                                  .white70,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 8),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: primaryColor
+                                                                .withOpacity(
+                                                                    0.2),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                          child: Text(
+                                                            "Items: ${vehicleData.totalItems}",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          VehicleDetailsPage(
+                                                        driverName: vehicleData
+                                                            .driverName
+                                                            .toString(),
+                                                        id: vehicleData
+                                                            .vehicleId
+                                                            .toString(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                icon: const Icon(
+                                                  Icons.visibility_outlined,
+                                                  color: primaryColor,
+                                                  size: 20,
+                                                ),
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   );
                                 },
                               ),
-                      ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

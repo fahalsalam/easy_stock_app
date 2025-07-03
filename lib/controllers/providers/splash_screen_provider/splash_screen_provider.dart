@@ -9,9 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:another_flushbar/flushbar.dart';
 
-
-
-
 class SplashProvider extends ChangeNotifier {
   SplashProvider(BuildContext context) {
     navigate(context);
@@ -21,7 +18,8 @@ class SplashProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? isRemembered = prefs.getBool('isRememberMe') ?? false;
     bool? isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-
+    String? username = prefs.getString('username');
+    String? userCode = prefs.getString('userCode');
     await Future.delayed(const Duration(seconds: 3));
 
     // Ensure context is still valid before navigating
@@ -36,8 +34,6 @@ class SplashProvider extends ChangeNotifier {
         );
       }
     } else if (isRemembered) {
-      String? username = prefs.getString('username');
-      String? userCode = prefs.getString('userCode');
       String? password = prefs.getString('password');
 
       if (username != null && userCode != null && password != null) {
@@ -89,7 +85,3 @@ class SplashProvider extends ChangeNotifier {
     }
   }
 }
-
-
-
-

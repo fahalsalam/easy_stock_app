@@ -10,10 +10,60 @@ import '../../../utils/common_widgets/background_image_widget.dart';
 class PurchaseMainMenuPage extends StatelessWidget {
   const PurchaseMainMenuPage({super.key});
 
+  // Define route builders instead of static routes
+  void _navigateToAddItem(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const ItemListPage2(),
+        transitionDuration: const Duration(milliseconds: 200),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
+  void _navigateToEditRequest(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const OrderListpage(),
+        transitionDuration: const Duration(milliseconds: 200),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
+  void _navigateToHistory(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HistoryLpoListPage(),
+        transitionDuration: const Duration(milliseconds: 200),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var screenHeight = MediaQuery.of(context).size.height;
-    var screenWidth = MediaQuery.of(context).size.width;
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+
+    // Pre-calculate common padding values
+    final topPadding = screenHeight * 0.14;
+    final horizontalPadding = 15.0;
+    final appBarTopPadding = screenHeight * 0.06;
+    final appBarHorizontalPadding = screenWidth * 0.02;
 
     return Scaffold(
       body: Stack(
@@ -22,46 +72,40 @@ class PurchaseMainMenuPage extends StatelessWidget {
             image: common_backgroundImage,
           ),
           Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "BPO Details"),
+            top: appBarTopPadding,
+            left: appBarHorizontalPadding,
+            right: appBarHorizontalPadding,
+            child: CustomAppBar(txt: "Item Request"),
           ),
           Padding(
             padding: EdgeInsets.only(
-              top: screenHeight * 0.14,
-              left: 15,
-              right: 15,
+              top: topPadding,
+              left: horizontalPadding,
+              right: horizontalPadding,
             ),
             child: SingleChildScrollView(
               child: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ListItem(screenHeight, screenWidth, "Add Item Request",
-                        onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ItemListPage2()),
-                      );
-                    }),
-                    ListItem(screenHeight, screenWidth, "Edit Request",
-                        onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const OrderListpage()),
-                      );
-                    }),
-                    ListItem(screenHeight, screenWidth, "Request History",
-                        onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HistoryLpoListPage()),
-                      );
-                    }),
+                    ListItem(
+                      screenHeight,
+                      screenWidth,
+                      "Add Item Request",
+                      onPressed: () => _navigateToAddItem(context),
+                    ),
+                    ListItem(
+                      screenHeight,
+                      screenWidth,
+                      "Edit Request",
+                      onPressed: () => _navigateToEditRequest(context),
+                    ),
+                    ListItem(
+                      screenHeight,
+                      screenWidth,
+                      "Request History",
+                      onPressed: () => _navigateToHistory(context),
+                    ),
                   ],
                 ),
               ),

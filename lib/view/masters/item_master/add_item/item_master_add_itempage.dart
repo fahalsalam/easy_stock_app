@@ -66,7 +66,7 @@ class _ItemMasterAddItemPageState extends State<ItemMasterAddItemPage> {
                     padding: EdgeInsets.zero,
                     children: [
                       CustomTextfield(
-                        mandatory : true,
+                        mandatory: true,
                         controller: ItemmasterProvider.itemNameController,
                         txt: "Item Name",
                         hintText: "",
@@ -75,16 +75,16 @@ class _ItemMasterAddItemPageState extends State<ItemMasterAddItemPage> {
                           color: Colors.transparent,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      CustomTextfield(mandatory : true,
-                        controller: ItemmasterProvider.itemCodeController,
-                        txt: "Item Code",
-                        hintText: "",
-                        suffixIcon: const Icon(
-                          Icons.add,
-                          color: Colors.transparent,
-                        ),
-                      ),
+                      // const SizedBox(height: 5),
+                      // CustomTextfield(mandatory : true,
+                      //   controller: ItemmasterProvider.itemCodeController,
+                      //   txt: "Item Code",
+                      //   hintText: "",
+                      //   suffixIcon: const Icon(
+                      //     Icons.add,
+                      //     color: Colors.transparent,
+                      //   ),
+                      // ),
                       const SizedBox(height: 5),
                       CustomTextfield(
                         controller: ItemmasterProvider.barcodeController,
@@ -202,17 +202,19 @@ class _ItemMasterAddItemPageState extends State<ItemMasterAddItemPage> {
                                       ),
                               ),
                               onPressed: () {
-                                if (ItemmasterProvider.itemCodeController.text.isEmpty) {
-                                  showSnackBarWithsub(
-                                    context,
-                                    "Please Enter Item Code",
-                                    "Error",
-                                    Colors.red,
-                                  );
+                                // if (ItemmasterProvider
+                                //     .itemCodeController.text.isEmpty) {
+                                //   showSnackBarWithsub(
+                                //     context,
+                                //     "Please Enter Item Code",
+                                //     "Error",
+                                //     Colors.red,
+                                //   );
 
-                                  return; // Exit early if validation fails
-                                }
-                                if (ItemmasterProvider.itemNameController.text.isEmpty) {
+                                //   return; // Exit early if validation fails
+                                // }
+                                if (ItemmasterProvider
+                                    .itemNameController.text.isEmpty) {
                                   showSnackBarWithsub(
                                     context,
                                     "Please Enter Item Name",

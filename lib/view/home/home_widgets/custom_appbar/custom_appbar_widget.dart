@@ -3,7 +3,8 @@ import 'package:easy_stock_app/view/login/signIn/signIn_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBarWidget extends StatelessWidget {
-  const CustomAppBarWidget({super.key});
+  final String userName;
+  const CustomAppBarWidget({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,15 @@ class CustomAppBarWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: screenWidth * 0.25),
+          // Text(
+          //   userName ?? '',
+          //   style: TextStyle(
+          //     fontWeight: FontWeight.w600,
+          //     fontSize: 11,
+          //     color: Colors.white,
+          //   ),
+          // ),
+          SizedBox(width: screenWidth * 0.2),
           const Text(
             "Easy Stock",
             style: TextStyle(

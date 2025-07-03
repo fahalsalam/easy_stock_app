@@ -1,6 +1,7 @@
 import 'package:easy_stock_app/controllers/providers/purchase_providers/history/historyProvider.dart';
 import 'package:easy_stock_app/models/purchase_order/historyModel/history_totallistmodel.dart';
 import 'package:easy_stock_app/utils/common_widgets/custom_appbar.dart';
+import 'package:easy_stock_app/utils/constants/colors/colors.dart';
 import 'package:easy_stock_app/utils/constants/images/images.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,6 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch details and store the future for FutureBuilder
     _fetchDetailsFuture =
         Provider.of<PurchaseHistoryProvider>(context, listen: false)
             .fetchDetails(editNo: widget.editno, orderId: widget.orderId);
@@ -38,85 +38,156 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.05,
-            left: screenWidth * 0.05,
-            child: CustomAppBar(txt: "History"),
-          ),
-          Positioned(
-            top: screenHeight * 0.13,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Total Item List",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.white),
-                    ),
-                    SizedBox(height: screenHeight * 0.008),
-                    const Text(
-                      "Note : Always recheck whenever you confirm the order",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 12,
-                          color: Colors.white),
-                    ),
-                    FutureBuilder<void>(
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                  child: CustomAppBar(txt: "History"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.05,
+                      vertical: screenHeight * 0.01),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white24, width: 1),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.history, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              "Total Item List",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white12, width: 1),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.info_outline,
+                                color: Colors.white70, size: 16),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "Note: Always recheck whenever you confirm the order",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    child: FutureBuilder<void>(
                       future: _fetchDetailsFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return SizedBox(
-                            height: screenHeight * 0.8,
-                            child: const Center(
-                              child: const CircularProgressIndicator(
-                                  color: Colors.white),
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: primaryColor,
+                              strokeWidth: 3,
                             ),
                           );
                         } else if (snapshot.hasError) {
-                          return const Center(
-                            child: Text(
-                              "An error occurred",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red,
+                                  size: 48,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  "An error occurred",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         } else if (historyProvider.details.isEmpty) {
-                          return SizedBox(
-                            height: screenHeight * 0.3,
-                            child: const Center(
-                              child: Text(
-                                "No Data",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  size: 48,
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  "No History Found",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         } else {
-                          return SizedBox(
-                            height: screenHeight * 0.65,
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(12),
+                              border:
+                                  Border.all(color: Colors.white24, width: 1),
+                            ),
                             child: ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 50),
+                              padding: const EdgeInsets.all(12),
                               itemCount: historyProvider.details.length,
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
                                 final item = historyProvider.details[index];
                                 return Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.only(bottom: 12),
                                   child: _buildOrderItem(
-                                      item,
-                                      index,
-                                      context,
-                                      historyProvider,
-                                      screenHeight,
-                                      screenWidth),
+                                    item,
+                                    index,
+                                    context,
+                                    historyProvider,
+                                    screenHeight,
+                                    screenWidth,
+                                  ),
                                 );
                               },
                             ),
@@ -124,13 +195,17 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
                         }
                       },
                     ),
-                    SizedBox(height: screenHeight * 0.01),
-                    _buildSummary(
-                        context, historyProvider, screenWidth, screenHeight),
-                    SizedBox(height: screenHeight * 0.01),
-                  ],
+                  ),
                 ),
-              ),
+                if (historyProvider.details.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.05,
+                        vertical: screenHeight * 0.01),
+                    child: _buildSummary(
+                        context, historyProvider, screenWidth, screenHeight),
+                  ),
+              ],
             ),
           ),
         ],
@@ -140,39 +215,57 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
 
   Widget _buildSummary(BuildContext context, PurchaseHistoryProvider provider,
       double screenWidth, double screenHeight) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
       child: Column(
         children: [
-          _buildSummaryRow("Total Items", provider.details.length.toStringAsFixed(2)),
-          SizedBox(height: screenHeight * 0.008),
-          _buildSummaryRow("Grand Total", provider.getPrice()),
+          _buildSummaryRow(
+            "Total Items",
+            provider.details.length.toStringAsFixed(2),
+            Icons.shopping_bag_outlined,
+          ),
+          const Divider(color: Colors.white24, height: 24),
+          _buildSummaryRow(
+            "Grand Total",
+            provider.getPrice(),
+            Icons.payments_outlined,
+            isTotal: true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(String label, String value, IconData icon,
+      {bool isTotal = false}) {
     return Row(
       children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              fontSize: 15,
-            ),
+        Icon(
+          icon,
+          color: isTotal ? primaryColor : Colors.white70,
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isTotal ? primaryColor : Colors.white,
+            fontSize: 15,
           ),
         ),
-        const Text(" : "),
+        const Spacer(),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-            fontSize: 14,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isTotal ? primaryColor : Colors.white,
+            fontSize: 16,
           ),
         ),
       ],
@@ -187,84 +280,82 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
       double screenHeight,
       double screenWidth) {
     return Container(
-      height: screenHeight * 0.12,
-      width: screenWidth * 0.06,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.grey.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white.withOpacity(0.1),
+        border: Border.all(color: Colors.white24, width: 1),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-            Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-            child: Container(
-              height: screenHeight * 0.06,
-              width: screenWidth * 0.15,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
-                child: Image.network(
-                  item.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.image, size: 40, color: Colors.white),
-                ),
+          Container(
+            height: screenHeight * 0.06,
+            width: screenWidth * 0.12,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white24, width: 1),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                item.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.image, size: 24, color: Colors.white70),
               ),
             ),
           ),
-         
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: screenHeight * 0.03,
-                width: screenWidth * 0.48,
-                child: Text(
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
                   item.productName,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Unit: ${item.uomCode} ",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.03),
-                  Text(
-                    "Qty: ${double.parse(item.qty).toStringAsFixed(2)}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                "${double.parse(item.price).toStringAsFixed(2)} AED",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                  fontSize: 14,
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    _buildTag(
+                        'Qty: ${double.parse(item.qty).toStringAsFixed(2)}'),
+                    const SizedBox(width: 6),
+                    _buildTag(
+                        '${double.parse(item.price).toStringAsFixed(2)} AED',
+                        isPrice: true),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(width: 0.02),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTag(String text, {bool isPrice = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: isPrice
+            ? primaryColor.withOpacity(0.2)
+            : Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: isPrice ? primaryColor : Colors.white70,
+          fontSize: 12,
+        ),
       ),
     );
   }
@@ -561,7 +652,6 @@ class _HistoryTotalItemListPageState extends State<HistoryTotalItemListPage> {
 //                       //       }
 //                       //     },
 //                       //   ),
-//                       // )
 // // const Spacer(),
 //           // IconButton(
 //           //   onPressed: () async {

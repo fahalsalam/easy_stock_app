@@ -84,6 +84,7 @@ class PurchaseItemListProvider with ChangeNotifier {
       Map<String, dynamic> jsonData = json.decode(res);
       ProductdataList obj = ProductdataList.fromJson(jsonData);
       productDatas = obj.data;
+      filteredProductDatas = productDatas;
       applySearchFilter();
     } else {
       productDatas = [];
@@ -205,15 +206,16 @@ class PurchaseItemListProvider with ChangeNotifier {
   }
 
   String getTotalPrice() => totalPrice.toString();
-  String getTotalCartQty() =>
-    _cartItems.fold(0.0, (sum, item) => sum + item.quantity).toStringAsFixed(2);
+  String getTotalCartQty() => _cartItems
+      .fold(0.0, (sum, item) => sum + item.quantity)
+      .toStringAsFixed(2);
 
   // String getTotalCartQty() =>
   //     _cartItems.fold(0, (sum, item) => sum + item.quantity).toString();
 
   // Confirm and Cancel Functions
   Future<bool> confirmFunction(List<ProductItem> _cartItem, context) async {
-    _isLoading=true;
+    _isLoading = true;
     notifyListeners();
     List<Product> productItemsList =
         _cartItem.map((item) => transformToProduct(item)).toList();
@@ -221,8 +223,8 @@ class PurchaseItemListProvider with ChangeNotifier {
     var res = await postPurchaseOrderApi(
         productItemsList, totalPrice, totalVat, 'O', '0', '0');
 
-    if (res != 'Failed') { 
-        _isLoading=false;
+    if (res != 'Failed') {
+      _isLoading = false;
       notifyListeners();
       showSnackBar(context, "", "Saved", Colors.white);
       _cartItem.clear();
@@ -232,10 +234,10 @@ class PurchaseItemListProvider with ChangeNotifier {
       Navigator.pop(context);
       return true;
     } else {
-      _isLoading=false;
+      _isLoading = false;
       notifyListeners();
       showSnackBar(context, "", "Error", Colors.white);
-       Navigator.pop(context);
+      Navigator.pop(context);
       return false;
     }
   }

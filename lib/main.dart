@@ -32,11 +32,11 @@ import 'controllers/providers/splash_screen_provider/splash_screen_provider.dart
 import 'utils/constants/colors/colors.dart';
 import 'view/splash_screens/splash_screens/splash_screen.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // SharedPreferences prefs = await SharedPreferences.getInstance();
   debugPrintGestureArenaDiagnostics = false;
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -56,7 +56,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ProductMasterProvider()),
         ChangeNotifierProvider(create: (context) => EditItemProvider()),
         ChangeNotifierProvider(create: (context) => UserConfigureProvider()),
-        ChangeNotifierProvider(create: (context) => VehicleManagementProvider()),
+        ChangeNotifierProvider(
+            create: (context) => VehicleManagementProvider()),
         ChangeNotifierProvider(create: (context) => PurchaseItemListProvider()),
         ChangeNotifierProvider(create: (context) => DropdownProvider()),
         ChangeNotifierProvider(create: (context) => AddCategoryProvider()),
@@ -65,10 +66,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ItemMasterProvider()),
         ChangeNotifierProvider(create: (context) => UomMasterProvider()),
         ChangeNotifierProvider(create: (context) => ImagePickerProvider()),
-        ChangeNotifierProvider(create: (context) => EditVehicleDetailsProvider()),
+        ChangeNotifierProvider(
+            create: (context) => EditVehicleDetailsProvider()),
         ChangeNotifierProvider(create: (context) => LpolistProvider()),
         ChangeNotifierProvider(create: (context) => PoProvider()),
-        ChangeNotifierProvider(create: (context) => CustomerManagementProvider()),
+        ChangeNotifierProvider( 
+            create: (context) => CustomerManagementProvider()),
         ChangeNotifierProvider(create: (context) => UserEditProvider()),
         ChangeNotifierProvider(create: (context) => BpoProvider()),
         ChangeNotifierProvider(create: (context) => BpoVehicleProvider()),
@@ -84,7 +87,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: primaryColor,
         ),
-        navigatorObservers: [routeObserver], // Use the single observer
+        navigatorObservers: [routeObserver],
         home: const SplashScreen(),
         builder: (context, widget) {
           return widget!;
@@ -93,8 +96,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

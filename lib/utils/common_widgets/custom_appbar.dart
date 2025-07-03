@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {
-  String txt;
-  CustomAppBar({super.key, required this.txt});
+  final String txt;
+  final List<Widget>? actions;
+  const CustomAppBar({super.key, required this.txt, this.actions});
 
   @override
   Widget build(BuildContext context) {
-    var screenHeight = MediaQuery.of(context).size.height;
-    var screenWidth = MediaQuery.of(context).size.width;
-
     return Container(
-      height: screenHeight * 0.06,
-      width: screenWidth * 0.9,
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           IconButton(
             icon: const Icon(
@@ -32,14 +24,17 @@ class CustomAppBar extends StatelessWidget {
           const SizedBox(
             width: 15,
           ),
-          Text(
-            txt,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
+          Expanded(
+            child: Text(
+              txt,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
           ),
+          if (actions != null) ...actions!,
         ],
       ),
     );

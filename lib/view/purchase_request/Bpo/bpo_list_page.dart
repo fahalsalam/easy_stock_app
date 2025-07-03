@@ -41,23 +41,22 @@ class _BpoListPageState extends State<BpoListPage> with RouteAware {
     }
   }
 
-Future<void> _loadDatas() async {
-  setState(() {
-    isLoading = true;
-  });
-  try {
-    final bpoProvider = Provider.of<BpoProvider>(context, listen: false);
-    await bpoProvider.fetchData();
-    await bpoProvider.fetchDatabyid(widget.id);
-  } catch (e) {
-    log('Error fetching data: $e');
-  } finally {
+  Future<void> _loadDatas() async {
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
+    try {
+      final bpoProvider = Provider.of<BpoProvider>(context, listen: false);
+      await bpoProvider.fetchData();
+      await bpoProvider.fetchDatabyid(widget.id);
+    } catch (e) {
+      log('Error fetching data: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -70,243 +69,305 @@ Future<void> _loadDatas() async {
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
           Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
+            top: screenHeight * 0.05,
+            left: screenWidth * 0.05,
             child: CustomAppBar(txt: "BPO"),
           ),
           Positioned(
             top: screenHeight * 0.13,
-            left: 20,
-            right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: screenWidth * 0.87,
-                  child: const Text(
-                    "See all the requested items here. You can view all items on a single page.",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white24, width: 1),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.shopping_cart_outlined,
+                            color: Colors.white, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          "BPO List",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                bpoProvider.isLoading || isLoading
-                    ? _buildShimmerLoading(screenHeight,
-                        screenWidth) // Shimmer effect when loading
-                    : bpoProvider.products.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Data",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.white12, width: 1),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline,
+                            color: Colors.white70, size: 14),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            "View and manage your BPO items here",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 11,
+                              color: Colors.white70,
                             ),
-                          )
-                        : Center(
-                            child: Consumer<BpoProvider>(
-                                builder: (context, provider, child) {
-                              return Container(
-                                height: screenHeight * 0.8,
-                                child: ListView.builder(
-                                  padding: const EdgeInsets.only(bottom: 50),
-                                  itemCount: provider.products.length,
-                                  itemBuilder: (context, index) {
-                                    Item data = provider.products[index];
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                BpoDetailsPage(
-                                              productID: data.productId,
-                                              data: data,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  bpoProvider.isLoading || isLoading
+                      ? _buildShimmerLoading(screenHeight, screenWidth)
+                      : bpoProvider.products.isEmpty
+                          ? SizedBox(
+                              height: screenHeight * 0.25,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.shopping_cart_outlined,
+                                      size: 36,
+                                      color: Colors.white.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      "No BPO Items Found",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Consumer<BpoProvider>(
+                              builder: (context, provider, child) {
+                                return Container(
+                                  height: screenHeight * 0.65,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: Colors.white24, width: 1),
+                                  ),
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.all(8),
+                                    itemCount: provider.products.length,
+                                    itemBuilder: (context, index) {
+                                      Item data = provider.products[index];
+                                      return GestureDetector(
+                                        onTap: () {
+                                          bool isLast =
+                                              provider.products.length == 1;
+                                          log("BPO details page last: $isLast");
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BpoDetailsPage(
+                                                productID: data.productId,
+                                                data: data,
+                                                isLast: isLast,
+                                              ),
                                             ),
-                                          ),
-                                        ).then((_) {
-                                          setState(() {
-                                            isLoading = true;
+                                          ).then((_) {
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            _loadData();
+                                            Future.delayed(
+                                                const Duration(seconds: 2));
+                                            setState(() {
+                                              isLoading = false;
+                                            });
                                           });
-
-                                          _loadData();
-
-                                          Future.delayed(
-                                              const Duration(seconds: 2));
-
-                                          setState(() {
-                                            isLoading = false;
-                                          });
-                                        });
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          height: screenHeight * 0.082,
-                                          width: screenWidth * 0.75,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 5.0,
-                                              horizontal: 5,
+                                        },
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 8),
+                                          child: Container(
+                                            height: screenHeight * 0.08,
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.white.withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                  color: Colors.white24,
+                                                  width: 1),
                                             ),
                                             child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
-                                                Container(
-                                                  height: screenHeight * 0.045,
-                                                  width: screenWidth * 0.01,
-                                                  decoration: BoxDecoration(
-                                                      // color: Colors.red,
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(6.0),
+                                                  child: Container(
+                                                    height: screenHeight * 0.06,
+                                                    width: screenWidth * 0.12,
+                                                    decoration: BoxDecoration(
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              10)),
-                                                  child: Image.network(
-                                                    data.imageUrl,
-                                                    errorBuilder: (context,
-                                                            error,
-                                                            stackTrace) =>
-                                                        Icon(
-                                                      Icons.image,
-                                                      color: Colors.grey,
-                                                      size: 28,
+                                                              6),
+                                                      border: Border.all(
+                                                          color: Colors.white24,
+                                                          width: 1),
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                      child: Image.network(
+                                                        data.imageUrl,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                                error,
+                                                                stackTrace) =>
+                                                            const Icon(
+                                                                Icons.image,
+                                                                size: 24,
+                                                                color: Colors
+                                                                    .white),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-
-                                                Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 6),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
-                                                              .start,
+                                                              .center,
                                                       children: [
                                                         Text(
                                                           data.productName,
                                                           style:
                                                               const TextStyle(
-                                                            fontSize: 15,
                                                             fontWeight:
                                                                 FontWeight.w600,
                                                             color: Colors.white,
+                                                            fontSize: 13,
                                                           ),
+                                                          maxLines: 1,
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                         ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 5,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '${double.parse(data.qty).toStringAsFixed(2)} ${data.uomCode}',
-                                                          style: const TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              color:
-                                                                  primaryColor),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                        SizedBox(
-                                                          width: screenWidth *
-                                                              0.15,
-                                                        ),
-                                                        Text(
-                                                          'AED ${double.parse(data.price).toStringAsFixed(2)} ',
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 15,
+                                                        const SizedBox(
+                                                            height: 3),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          6,
+                                                                      vertical:
+                                                                          1),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            3),
+                                                              ),
+                                                              child: Text(
+                                                                '${double.parse(data.qty).toStringAsFixed(2)} ${data.uomCode}',
+                                                                style:
+                                                                    const TextStyle(
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w500,
-                                                                  color: Colors
-                                                                      .grey),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                                  color:
+                                                                      primaryColor,
+                                                                  fontSize: 11,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 6),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          6,
+                                                                      vertical:
+                                                                          1),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: primaryColor
+                                                                    .withOpacity(
+                                                                        0.2),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            3),
+                                                              ),
+                                                              child: Text(
+                                                                'AED ${double.parse(data.price).toStringAsFixed(2)}',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color:
+                                                                      primaryColor,
+                                                                  fontSize: 11,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
-                                                // GestureDetector(
-                                                //     onTap: () {
-                                                //       _openEditPriceDialog(
-                                                //         context,
-                                                //         double.parse(
-                                                //             data.price),
-                                                //         int.parse(
-                                                //             data.productId),
-                                                //         screenWidth,
-                                                //         screenHeight,
-                                                //         bpoProvider,
-                                                //       );
-                                                //     },
-                                                //     child: Material(
-                                                //       elevation: 5,
-                                                //       borderRadius:
-                                                //           BorderRadius.circular(
-                                                //               8),
-                                                //       child: Container(
-                                                //         height: screenHeight *
-                                                //             0.034,
-                                                //         width:
-                                                //             screenWidth * 0.2,
-                                                //         decoration:
-                                                //             BoxDecoration(
-                                                //           color: primaryColor,
-                                                //           borderRadius:
-                                                //               BorderRadius
-                                                //                   .circular(8),
-                                                //         ),
-                                                //         child: const Center(
-                                                //             child: FittedBox(
-                                                //           child: Text(
-                                                //               'Edit Price',
-                                                //               style: TextStyle(
-                                                //                   color: Colors
-                                                //                       .black,
-                                                //                   fontSize: 13,
-                                                //                   fontWeight:
-                                                //                       FontWeight
-                                                //                           .w600)),
-                                                //         )),
-                                                //       ),
-                                                //     ))
                                               ],
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            }),
-                          ),
-              ],
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                  SizedBox(height: screenHeight * 0.02),
+                ],
+              ),
             ),
           ),
         ],
@@ -314,217 +375,123 @@ Future<void> _loadDatas() async {
     );
   }
 
-void _openEditPriceDialog(BuildContext context, double value, int id,
-    double screenWidth, double screenHeight, BpoProvider bpoProvider) {
-  final TextEditingController _priceController =
-      TextEditingController(text: value.toString());
+  void _openEditPriceDialog(BuildContext context, double value, int id,
+      double screenWidth, double screenHeight, BpoProvider bpoProvider) {
+    final TextEditingController _priceController =
+        TextEditingController(text: value.toString());
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.grey.withOpacity(0.53),
-        title: const Text(
-          "Price",
-          style: TextStyle(
-              color: Color.fromARGB(255, 193, 191, 191),
-              fontSize: 17,
-              fontWeight: FontWeight.w600),
-        ),
-        content: Container(
-          width: screenWidth * 0.08,
-          height: screenHeight * 0.0454,
-          decoration: BoxDecoration(
-              color: Colors.grey.shade100.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(8)),
-          child: TextField(
-            controller: _priceController,
-            decoration: const InputDecoration(
-              hintText: 'Enter Price',
-            ),
-            keyboardType: TextInputType.number,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black.withOpacity(0.9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.white24, width: 1),
           ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              final updatedPrice = _priceController.text;
-              if (updatedPrice.isNotEmpty) {
-                Navigator.of(context).pop(); // Close the dialog
-                try {
-                  await bpoProvider.updateBulkPrice(
-                    productId: id,
-                    price: double.parse(updatedPrice),
-                    context: context,
-                  );
-                  // Reload data after updating
-                  await _loadDatas();
-                } catch (e) {
-                  log('Error updating price: $e');
+          title: const Text(
+            "Edit Price",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Container(
+            width: screenWidth * 0.8,
+            height: screenHeight * 0.06,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white24, width: 1),
+            ),
+            child: TextField(
+              controller: _priceController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: 'Enter Price',
+                hintStyle: TextStyle(color: Colors.white70),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final updatedPrice = _priceController.text;
+                if (updatedPrice.isNotEmpty) {
+                  Navigator.of(context).pop();
+                  try {
+                    await bpoProvider.updateBulkPrice(
+                      productId: id,
+                      price: double.parse(updatedPrice),
+                      context: context,
+                    );
+                    await _loadDatas();
+                  } catch (e) {
+                    log('Error updating price: $e');
+                  }
+                } else {
+                  showSnackBar(context, "", 'Enter valid data', Colors.red);
                 }
-              } else {
-                showSnackBar(context, "", 'Enter valid data', Colors.red);
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-            child: const Text(
-              "Update",
-              style: TextStyle(color: Colors.black),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                "Update",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog without saving
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(color: primaryColor),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-
-
-
-
-
-
-  // void _openEditPriceDialog(BuildContext context, double value, int id,
-  //     double screenWidth, double screenHeight, BpoProvider bpoProvider) {
-  //   final TextEditingController _priceController =
-  //       TextEditingController(text: value.toString());
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         backgroundColor: Colors.grey.withOpacity(0.53),
-  //         title: const Text(
-  //           "Price",
-  //           style: TextStyle(
-  //               color: Color.fromARGB(255, 193, 191, 191),
-  //               fontSize: 17,
-  //               fontWeight: FontWeight.w600),
-  //         ),
-  //         content: Container(
-  //           width: screenWidth * 0.08,
-  //           height: screenHeight * 0.0454,
-  //           decoration: BoxDecoration(
-  //               color: Colors.grey.shade100.withOpacity(0.8),
-  //               borderRadius: BorderRadius.circular(8)),
-  //           child: TextField(
-  //             controller: _priceController,
-  //             decoration: const InputDecoration(
-
-  //                 // labelText: 'Price', // Label for the TextField
-  //                 ),
-  //             keyboardType:
-  //                 TextInputType.number, // Set the keyboard type to number
-  //           ),
-  //         ),
-  //         actions: [
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               String updatedPrice = _priceController.text;
-  //               if (updatedPrice.isNotEmpty) {
-  //                 Navigator.of(context).pop();
-  //                 bpoProvider
-  //                     .updateBulkPrice(
-  //                         productId: id,
-  //                         price: double.parse(_priceController.text),
-  //                         context: context)
-  //                     .then((_) {
-  //                   _loadDatas();
-  //                 });
-  //                 print("Updated price: $updatedPrice");
-  //               } else {
-  //                 showSnackBar(context, "", 'Enter valid data', Colors.red);
-  //               }
-  //               // Close the dialog
-  //             },
-  //             style: ElevatedButton.styleFrom(backgroundColor: primaryColor
-  //                 // primary: Colors.green, // Change button color
-  //                 ),
-  //             child: const Text(
-  //               "Update",
-  //               style: TextStyle(
-  //                 color: Colors.black,
-  //               ),
-  //             ),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop(); // Close the dialog without saving
-  //             },
-  //             style: ElevatedButton.styleFrom(backgroundColor: Colors.black
-  //                 // primary: Colors.red, // Change cancel button color
-  //                 ),
-  //             child: const Text(
-  //               "Cancel",
-  //               style: TextStyle(
-  //                 color: primaryColor,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-}
-
-Widget _buildContentText(String label, String value, double screenWidth) {
-  return Row(
-    children: [
-      Text(
-        label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: primaryColor,
-        ),
-      ),
-      SizedBox(width: screenWidth * 0.02),
-      Text(
-        value,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: Colors.white,
-        ),
-      ),
-      SizedBox(width: screenWidth * 0.08),
-    ],
-  );
+          ],
+        );
+      },
+    );
+  }
 }
 
 Widget _buildShimmerLoading(double screenHeight, double screenWidth) {
   return Shimmer.fromColors(
     baseColor: Colors.grey[700]!,
     highlightColor: Colors.grey[400]!,
-    child: ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 5, // Number of shimmer items to show
-      itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          padding: const EdgeInsets.all(8),
-          width: screenWidth * 0.9,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-          ),
-        );
-      },
+    child: Container(
+      height: screenHeight * 0.7,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            height: screenHeight * 0.12,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          );
+        },
+      ),
     ),
   );
 }

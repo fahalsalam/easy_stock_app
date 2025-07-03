@@ -12,7 +12,9 @@ Future<String> putUserMaster(
     isMasters,
     isConsolidate,
     isDriver,
-    userID,category}) async {
+    userID,
+    category,
+    vehicleID}) async {
   log("user master put $defaultCustomer");
   var accessToken = await getToken();
   final bearerToken = "Bearer " "$accessToken";
@@ -29,12 +31,12 @@ Future<String> putUserMaster(
     "UserCode": userCode,
     "UserName": userName,
     "DefaultCustomer": defaultCustomer,
-    "MappedCategory":category,
+    "MappedCategory": category,
     "IsPurchaseRequest": isPurchase,
     "IsMasters": isMasters,
     "IsConsolidatedPurchase": isConsolidate,
     "IsDriver": isDriver,
-
+    if (isDriver) "VehicleID": vehicleID
   };
 
   log('-------------->>>>>>>>>>User body: ${body},header:${headers}');
@@ -44,7 +46,8 @@ Future<String> putUserMaster(
         await http.put(url, headers: headers, body: jsonEncode(body));
 
     if (response.statusCode == 200) {
-      print('-------------->>>>>>>>>>User updated successfully: ${response.body}');
+      print(
+          '-------------->>>>>>>>>>User updated successfully: ${response.body}');
       return 'Success';
     } else {
       print(

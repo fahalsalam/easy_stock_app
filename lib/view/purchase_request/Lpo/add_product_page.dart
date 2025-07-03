@@ -19,17 +19,14 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
   double screenHeight = 0;
   double screenWidth = 0;
   bool isLoading = true;
-  String searchQuery = ""; // To hold the search query
+  String searchQuery = "";
   late List<TextEditingController> quantityControllers;
   TextEditingController searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-
-    // Initialize quantityControllers list
     quantityControllers = [];
-
-    // Fetch product data
     Future.microtask(() {
       final lpoListProvider =
           Provider.of<LpolistProvider>(context, listen: false);
@@ -44,7 +41,6 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
 
   @override
   void dispose() {
-    // Dispose of all controllers
     for (var controller in quantityControllers) {
       controller.dispose();
     }
@@ -60,144 +56,140 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "Add Products"),
-          ),
-          Positioned(
-            top: screenHeight * 0.115,
-            left: 0,
-            right: 0,
-            child: Consumer<LpolistProvider>(
-              builder: (context, lpoListProvider, child) {
-                final filteredProducts =
-                    lpoListProvider.filteredItems.where((product) {
-                  return product.productName
-                      .toLowerCase()
-                      .contains(searchQuery.toLowerCase());
-                }).toList();
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                  child: CustomAppBar(txt: "Add Products"),
+                ),
+                Expanded(
+                  child: Consumer<LpolistProvider>(
+                    builder: (context, lpoListProvider, child) {
+                      final filteredProducts =
+                          lpoListProvider.filteredItems.where((product) {
+                        return product.productName
+                            .toLowerCase()
+                            .contains(searchQuery.toLowerCase());
+                      }).toList();
 
-                // if (filteredProducts.isEmpty) {
-                // return SizedBox(
-                //   height: screenHeight * 0.5,
-                //   child: const Center(
-                //     child: Text(
-                //       "No products",
-                //       style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //       ),
-                //     ),
-                //   ),
-                // );
-                // }
-
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      // Search Bar
-                      SizedBox(
-                        height: screenHeight * 0.056,
-                        child: Center(
-                          child: TextField(
-                            cursorColor: primaryColor,
-                            onChanged: (value) {
-                              // setState(() {
-                              //   isLoading = true;
-                              // });
-                              // Future.delayed(Duration(seconds: 1));
-                              lpoListProvider
-                                  .updateSearchQuery(searchController.text);
-                              // setState(() {
-                              //   isLoading = false;
-                              // });
-                              // if (res) {
-                              //   searchController.clear();
-                              //   lpoListProvider.fetchProductData();
-                              // }
-                            },
-                            controller: searchController,
-                            decoration: InputDecoration(
-                              hintStyle: const TextStyle(
-                                color: Colors.white,
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.05),
+                        child: Column(
+                          children: [
+                            SizedBox(height: screenHeight * 0.02),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    Border.all(color: Colors.white24, width: 1),
                               ),
-                              hintText: 'Search products...',
-                              suffix: IconButton(
-                                onPressed: () {
-                                  // setState(() {
-                                  //   isLoading = true;
-                                  // });
-                                  // Future.delayed(Duration(seconds: 1));
-                               lpoListProvider
-                                      .updateSearchQuery(searchController.text);
-                                  // setState(() {
-                                  //   isLoading = false;
-                                  // });
-                                  // if (res) {
-                                  //   searchController.clear();
-                                  //   // lpoListProvider.fetchProductData();
-                                  // }
-                                },
-                                icon: const Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Product List
-                      filteredProducts.isEmpty
-                          ? SizedBox(
-                              height: screenHeight * 0.5,
-                              child: const Center(
-                                child: Text(
-                                  "No products",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Row(
+                                    children: [
+                                      Icon(Icons.search,
+                                          color: primaryColor, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "Search Products",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ),
-                            )
-                          : SizedBox(
-                              height: screenHeight * 0.75,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.15),
-                                itemCount: filteredProducts.length,
-                                itemBuilder: (context, index) {
-                                  final product = filteredProducts[index];
-                                  return allProductListTile(
-                                    product,
-                                    index,
-                                    lpoListProvider,
-                                    quantityControllers,
-                                  );
-                                },
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    cursorColor: primaryColor,
+                                    onChanged: (value) {
+                                      lpoListProvider.updateSearchQuery(
+                                          searchController.text);
+                                    },
+                                    controller: searchController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Search products...',
+                                      hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.5)),
+                                      filled: true,
+                                      fillColor: Colors.white.withOpacity(0.1),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 16),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: Colors.white24, width: 1),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: primaryColor, width: 1),
+                                      ),
+                                    ),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
                               ),
                             ),
-                    ],
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: filteredProducts.isEmpty
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.search_off_rounded,
+                                            size: 48,
+                                            color:
+                                                Colors.white.withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            "No Products Found",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16),
+                                      itemCount: filteredProducts.length,
+                                      itemBuilder: (context, index) {
+                                        final product = filteredProducts[index];
+                                        return allProductListTile(
+                                          product,
+                                          index,
+                                          lpoListProvider,
+                                          quantityControllers,
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ],
@@ -206,14 +198,13 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
   }
 
   Widget allProductListTile(
-      ItemData product,
-      int index,
-      LpolistProvider lpoListProvider,
-      List<TextEditingController> quantityControllers) {
-    // Retrieve the quantity from the provider
+    ItemData product,
+    int index,
+    LpolistProvider lpoListProvider,
+    List<TextEditingController> quantityControllers,
+  ) {
     int currentQuantity = lpoListProvider.getQuantity(product.productId);
 
-    // Initialize the controller only once for each product index
     if (quantityControllers.length <= index) {
       quantityControllers.add(
         TextEditingController(
@@ -225,24 +216,23 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
           currentQuantity == 0 ? "" : currentQuantity.toString();
     }
 
-    // Track whether the "Add" button and border color should change
     bool isQuantityEntered = quantityControllers[index].text.isNotEmpty;
 
     return StatefulBuilder(
       builder: (context, setState) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.only(bottom: 8),
           child: Container(
-            height: screenHeight * 0.2,
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(15),
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isQuantityEntered ? primaryColor : Colors.transparent,
+                color: isQuantityEntered ? primaryColor : Colors.white24,
+                width: 1,
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -250,27 +240,28 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: screenHeight * 0.1,
-                        width: screenWidth * 0.25,
+                        height: 60,
+                        width: 60,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white24, width: 1),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             product.imageUrl,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(
-                              Icons.panorama,
-                              size: 45,
-                              color: Color.fromARGB(255, 97, 92, 74),
+                              Icons.image,
+                              size: 24,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.05),
-                      Flexible(
+                      const SizedBox(width: 12),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -278,34 +269,64 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
                               product.productName,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              "Price: ${product.price.toStringAsFixed(2)} AED",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    "${product.price.toStringAsFixed(2)} AED",
+                                    style: const TextStyle(
+                                      color: primaryColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    "UOM: ${product.unit}",
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              "UOM: ${product.unit}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
                               ),
-                            ),
-                            Text(
-                              "Category: ${product.category}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                              child: Text(
+                                "Category: ${product.category}",
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -313,70 +334,91 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: TextField(
-                            cursorColor: primaryColor,
-                            controller: quantityControllers[index],
-                            decoration: InputDecoration(
-                              hintText: 'Enter quantity',
-                              hintStyle: const TextStyle(color: Colors.white54),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          cursorColor: primaryColor,
+                          controller: quantityControllers[index],
+                          decoration: InputDecoration(
+                            hintText: 'Enter quantity',
+                            hintStyle:
+                                TextStyle(color: Colors.white.withOpacity(0.5)),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
                             ),
-                            onChanged: (value) {
-                              setState(() {
-                                isQuantityEntered = value.isNotEmpty;
-                              });
-                            },
-                            style: const TextStyle(color: Colors.white),
-                            keyboardType: TextInputType.number,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide:
+                                  BorderSide(color: Colors.white24, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide:
+                                  BorderSide(color: primaryColor, width: 1),
+                            ),
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              isQuantityEntered = value.isNotEmpty;
+                            });
+                          },
+                          style: const TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.number,
                         ),
-                        SizedBox(width: screenWidth * 0.02),
-                        ElevatedButton(
-                          onPressed: () {
+                      ),
+                      const SizedBox(width: 8),
+                      Material(
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(8),
+                        child: InkWell(
+                          onTap: () {
                             String quantityText =
                                 quantityControllers[index].text;
                             int? quantity = int.tryParse(quantityText);
                             if (quantity != null) {
                               lpoListProvider.addProduct(
                                   product, quantity, context);
-                                  searchController.clear();
+                              searchController.clear();
                             } else {
                               showSnackBar(
-                                  context,
-                                  "Please enter a valid quantity",
-                                  "Error",
-                                  Colors.red);
+                                context,
+                                "Please enter a valid quantity",
+                                "Error",
+                                Colors.red,
+                              );
                             }
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                isQuantityEntered ? primaryColor : Colors.grey,
-                            shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: isQuantityEntered
+                                  ? primaryColor
+                                  : Colors.grey,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                          child: const Text(
-                            "Add",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600),
+                            child: const Center(
+                              child: Text(
+                                "Add",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -386,6 +428,4 @@ class _LpoAddProductPageState extends State<LpoAddProductPage> {
       },
     );
   }
-
-
 }

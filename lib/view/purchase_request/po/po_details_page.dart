@@ -13,20 +13,21 @@ class PoDetailsPage extends StatefulWidget {
   final String orderId;
   final String editNo;
   final String customerName;
-    String companyname;
-  String country;
-  String state;
-  String trnno;
- PoDetailsPage(
-      {super.key,
-      required this.orderId,
-      required this.editNo,
-      required this.customerName,
-       required this.companyname,
-      required this.country,
-      required this.state,
-      required this.trnno
-      });
+  final String companyname;
+  final String country;
+  final String state;
+  final String trnno;
+
+  const PoDetailsPage({
+    super.key,
+    required this.orderId,
+    required this.editNo,
+    required this.customerName,
+    required this.companyname,
+    required this.country,
+    required this.state,
+    required this.trnno,
+  });
 
   @override
   State<PoDetailsPage> createState() => _PoDetailsPageState();
@@ -34,6 +35,7 @@ class PoDetailsPage extends StatefulWidget {
 
 class _PoDetailsPageState extends State<PoDetailsPage> {
   bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +44,9 @@ class _PoDetailsPageState extends State<PoDetailsPage> {
       Provider.of<LpolistProvider>(context, listen: false)
           .fetchDetails(orderId: widget.orderId, editNo: widget.editNo)
           .then((_) {
-        isLoading = false;
+        setState(() {
+          isLoading = false;
+        });
       });
     });
   }
@@ -57,133 +61,169 @@ class _PoDetailsPageState extends State<PoDetailsPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-            top: screenHeight * 0.06,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.02,
-            child: CustomAppBar(txt: "Purchase Orders"),
-          ),
-          Positioned(
-            top: screenHeight * 0.13,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.info,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        SizedBox(
-                          width: screenWidth * 0.8,
-                          child: const Text(
-                            "You can’t edit anything here, but you can check out Actual Received orders!",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Material(
-                          elevation: 3,
-                          borderRadius: BorderRadius.circular(10),
-                          child: GestureDetector(
-                            onTap: () async {
-                              // Push to the EditOrderListPage
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => poinvoicePage(
-                                    dataList: lpoListProvider.details,
-                                    lpoNumber: widget.orderId.toString(),
-                                    customerName: widget.customerName,
-                                     companyname:
-                                                      widget.companyname,
-                                                  country: widget.country,
-                                                  state: widget.state,
-                                                  trnno: widget.trnno,
-                                  ),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CustomAppBar(
+                    txt: "LPO No: ${widget.orderId}",
+                    actions: [
+                      Material(
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => poinvoicePage(
+                                  dataList: lpoListProvider.details,
+                                  lpoNumber: widget.orderId.toString(),
+                                  customerName: widget.customerName,
+                                  companyname: widget.companyname,
+                                  country: widget.country,
+                                  state: widget.state,
+                                  trnno: widget.trnno,
                                 ),
-                              );
-                            },
-                            child: Container(
-                              height: screenHeight * 0.035,
-                              width: screenWidth * 0.2,
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: BorderRadius.circular(5),
-                                border:
-                                    Border.all(width: 1, color: primaryColor),
                               ),
-                              child: const Center(
-                                child: Text(
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.visibility_outlined,
+                                  color: Colors.black,
+                                  size: 18,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
                                   "Preview",
                                   style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white24, width: 1),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline,
+                                  color: primaryColor,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "You can't edit anything here, but you can check out Actual Received orders!",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: isLoading
+                              ? _buildShimmerLoading(screenHeight, screenWidth)
+                              : lpoListProvider.details.isEmpty
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.inventory_2_outlined,
+                                            size: 48,
+                                            color:
+                                                Colors.white.withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Text(
+                                            "No Products Found",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  Colors.white.withOpacity(0.7),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      itemCount: lpoListProvider.details.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final lpodata =
+                                            lpoListProvider.details[index];
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 8),
+                                          child: _buildOrderItem(
+                                            lpodata,
+                                            index,
+                                            context,
+                                            lpoListProvider,
+                                            screenHeight,
+                                            screenWidth,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: screenHeight * 0.8,
-                      child: isLoading
-                          ? _buildShimmerLoading(screenHeight, screenWidth)
-                          : lpoListProvider.details.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                    "No Product Data",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  itemCount: lpoListProvider.details.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    final lpodata =
-                                        lpoListProvider.details[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: _buildOrderItem(
-                                          lpodata,
-                                          index,
-                                          context,
-                                          lpoListProvider,
-                                          screenHeight,
-                                          screenWidth),
-                                    );
-                                  }),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -191,90 +231,120 @@ class _PoDetailsPageState extends State<PoDetailsPage> {
     );
   }
 
-  Widget _buildOrderItem(Detail item, int index, BuildContext context,
-      LpolistProvider provider, double screenHeight, double screenWidth) {
-    return 
-      // visible: item.itemStatus != 'NoStock',
-     Container(
-        height: screenHeight * 0.12,
-        width: screenWidth * 0.06,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.grey.withOpacity(0.2),
-            border: Border.all(color: primaryColor, width: 0.52)),
+  Widget _buildOrderItem(
+    Detail item,
+    int index,
+    BuildContext context,
+    LpolistProvider provider,
+    double screenHeight,
+    double screenWidth,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-                child: Container(
-              height: screenHeight * 0.07,
-              width: screenWidth * 0.18,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
+            Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white24, width: 1),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
+                borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   item.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.image, size: 40, color: Colors.white),
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.image,
+                    size: 24,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            )),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // SizedBox(height: 0.05,),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                  width: screenWidth * 0.48,
-                  child: Text(
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     item.productName,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w600,
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Uom: ${item.uomCode}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 14,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          "${double.parse(item.price).toStringAsFixed(2)} AED",
+                          style: const TextStyle(
+                            color: primaryColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(width: screenWidth * 0.03),
-                    Text(
-                      "Qty: ${double.parse(item.qty).toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 14,
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          "UOM: ${item.uomCode}",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Text(
-                  "${double.parse(item.price).toStringAsFixed(2)} AED",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    fontSize: 14,
+                    ],
                   ),
-                ),
-              
-              ],
+                  const SizedBox(height: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "Quantity: ${double.parse(item.qty).toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-     
+      ),
     );
   }
 
@@ -286,16 +356,45 @@ class _PoDetailsPageState extends State<PoDetailsPage> {
         padding: const EdgeInsets.symmetric(vertical: 10),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 5, // Number of shimmer items to show
+        itemCount: 5,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            padding: const EdgeInsets.all(8),
-          height: screenHeight * 0.12,
-        width: screenWidth * 0.06,
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
-               borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 16,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 12,
+                        width: 100,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },

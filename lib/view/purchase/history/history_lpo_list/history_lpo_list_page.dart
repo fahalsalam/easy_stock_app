@@ -16,12 +16,19 @@ class HistoryLpoListPage extends StatefulWidget {
 }
 
 class _HistoryLpoListPageState extends State<HistoryLpoListPage> {
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<PurchaseHistoryProvider>(context, listen: false).fetchData();
+      Provider.of<PurchaseHistoryProvider>(context, listen: false)
+          .fetchData()
+          .then((value) {
+        setState(() {
+          isLoading = false;
+        });
+      });
     });
   }
 
@@ -34,47 +41,64 @@ class _HistoryLpoListPageState extends State<HistoryLpoListPage> {
       body: Stack(
         children: [
           BackgroundImageWidget(image: common_backgroundImage),
-          Positioned(
-              top: screenHeight * 0.05,
-              left: screenWidth * 0.04,
-              child: CustomAppBar(txt: "History")),
-          Positioned(
-            top: screenHeight * 0.13,
-            left: 0,
-            right: 0,
-            bottom: 0, // Allow content to extend to the bottom of the screen
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  buildHeader(),
-                  const SizedBox(height: 10),
-                  historyProvider.data.isEmpty
-                      ? SizedBox(
-                          height: screenHeight * 0.3,
-                          child: const Center(
-                            child: Text(
-                              "No Data",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                  child: CustomAppBar(txt: "History"),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        buildHeader(),
+                        const SizedBox(height: 10),
+                        if (isLoading)
+                          SizedBox(
+                            height: screenHeight * 0.7,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
+                          )
+                        else if (historyProvider.data.isEmpty)
+                          SizedBox(
+                            height: screenHeight * 0.3,
+                            child: const Center(
+                              child: Text(
+                                "No Data",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: ListView.builder(
                               padding:
                                   const EdgeInsets.only(bottom: 10, top: 10),
                               itemCount: historyProvider.data.length,
                               itemBuilder: (context, index) {
                                 return buildLpoListSection(
-                                    historyProvider.data[index].timeRange,
-                                    screenHeight,
-                                    screenWidth,
-                                    historyProvider.data[index].records);
-                              })),
-                ],
-              ),
+                                  historyProvider.data[index].timeRange,
+                                  screenHeight,
+                                  screenWidth,
+                                  historyProvider.data[index].records,
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -170,6 +194,7 @@ class _HistoryLpoListPageState extends State<HistoryLpoListPage> {
             padding: EdgeInsets.zero,
             itemCount: records.length,
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return buildLpoItem(index, context, records[index], time,
                   screenWidth, screenHeight);

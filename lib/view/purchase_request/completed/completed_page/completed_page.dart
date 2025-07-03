@@ -18,6 +18,7 @@ class RequestCompletdPage extends StatefulWidget {
 
 class _RequestCompletdPageState extends State<RequestCompletdPage> {
   bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +38,7 @@ class _RequestCompletdPageState extends State<RequestCompletdPage> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     final provider = Provider.of<CompletedProvider>(context);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -48,223 +50,301 @@ class _RequestCompletdPageState extends State<RequestCompletdPage> {
             child: CustomAppBar(txt: "Completed"),
           ),
           Positioned(
-            top: screenHeight * 0.135,
-            left: 15,
-            right: 15,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                  child: Text(
-                    "After Purchase You Can Get Invoice Here",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
+            top: screenHeight * 0.13,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24, width: 1),
                     ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                  child: Text(
-                    "Completed",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.green,
-                    ),
-                  ),
-                ),
-                isLoading
-                    ? SizedBox(
-                        height: screenHeight * 0.3,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_outline,
+                            color: Colors.green,
+                            size: 18,
                           ),
                         ),
-                      )
-                    : provider.pendingBPOs.isEmpty
-                        ? SizedBox(
-                            height: screenHeight * 0.3,
-                            child: const Center(
-                              child: Text(
-                                "No Data",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "After Purchase You Can Get Invoice Here",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: Colors.green.withOpacity(0.3), width: 1),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "Completed",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: isLoading
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const CircularProgressIndicator(
+                                  color: primaryColor,
+                                  strokeWidth: 2,
                                 ),
-                              ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  "Loading completed orders...",
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
                           )
-                        : SizedBox(
-                            // color:Colors.red,
-                            height: screenHeight * 0.8,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              padding:
-                                  const EdgeInsets.only(bottom: 100, top: 5),
-                              itemCount: provider.pendingBPOs.length,
-                              itemBuilder: (context, index) {
-                                PendingData detail =
-                                    provider.pendingBPOs[index];
-
-                                return Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              CompletedDetailsPage(
-                                            orderID: detail.orderId,
-                                            editNo: detail.editNo,
-                                            customerName: detail.customerName,
-                                            orderId:
-                                                detail.customerId.toString(),
-                                            companyname: provider.companyname,
-                                            country: provider.country,
-                                            state: provider.state,
-                                            trnno: provider.trnno,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      height: screenHeight * 0.095,
-                                      width: screenWidth * 0.8,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.black,
+                        : provider.pendingBPOs.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.inventory_2_outlined,
+                                      size: 48,
+                                      color: Colors.white.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "No Completed Orders",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white.withOpacity(0.7),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 17,
-                                            backgroundColor: primaryColor,
-                                            child: Center(
-                                              child: Text(
-                                                detail.customerName[0]
-                                                    .toUpperCase(),
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                itemCount: provider.pendingBPOs.length,
+                                itemBuilder: (context, index) {
+                                  PendingData detail =
+                                      provider.pendingBPOs[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CompletedDetailsPage(
+                                              orderID: detail.orderId,
+                                              editNo: detail.editNo,
+                                              customerName: detail.customerName,
+                                              orderId:
+                                                  detail.customerId.toString(),
+                                              companyname: provider.companyname,
+                                              country: provider.country,
+                                              state: provider.state,
+                                              trnno: provider.trnno,
                                             ),
                                           ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: Colors.white24, width: 1),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12),
+                                          child: Row(
                                             children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                              Container(
+                                                height: 40,
+                                                width: 40,
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    detail.customerName[0]
+                                                        .toUpperCase(),
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    SizedBox(
-                                                      height:
-                                                          screenHeight * 0.03,
-                                                      width: screenWidth * 0.55,
-                                                      child: Text(
-                                                        detail.customerName,
-                                                        style: const TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.white,
-                                                        ),
+                                                    Text(
+                                                      detail.customerName,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
                                                       ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                          child: Text(
+                                                            "LPO: ${detail.orderId}",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Colors
+                                                                  .white70,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 8),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: primaryColor
+                                                                .withOpacity(
+                                                                    0.2),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                          child: Text(
+                                                            "Items: ${detail.totalItems}",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                              Padding(
+                                              Container(
                                                 padding:
-                                                    const EdgeInsets.all(3.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    buildContentText(
-                                                        "LPO:",
-                                                        detail.orderId,
-                                                        screenWidth),
-                                                  ],
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                      color: Colors.white24,
+                                                      width: 1),
                                                 ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 3),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    buildContentText(
-                                                        "Total Item:",
-                                                        detail.totalItems,
-                                                        screenWidth),
-                                                  ],
+                                                child: const Icon(
+                                                  Icons.visibility_outlined,
+                                                  color: primaryColor,
+                                                  size: 18,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CompletedDetailsPage(
-                                                            orderID:
-                                                                detail.orderId,
-                                                            editNo:
-                                                                detail.editNo,
-                                                            customerName: detail
-                                                                .customerName,
-                                                            orderId: detail
-                                                                .orderId
-                                                                .toString(),
-                                                            companyname: provider
-                                                                .companyname,
-                                                            country: provider
-                                                                .country,
-                                                            state:
-                                                                provider.state,
-                                                            trnno:
-                                                                provider.trnno,
-                                                          )));
-                                            },
-                                            child: const Icon(
-                                              Icons.visibility,
-                                              color: Colors.white,
-                                              size: 20,
-                                            ),
-                                          ),
-                                          SizedBox(width: screenWidth * 0.03),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-              ],
+                                  );
+                                },
+                              ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

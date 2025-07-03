@@ -55,6 +55,7 @@ Widget buildItemList(double screenHeight, double screenWidth,
           ),
   );
 }
+
 Widget buildItemListRow(double screenHeight, double screenWidth,
     PurchaseItemListProvider provider, List<ProductDatum> list
     //  CartProvider cartProvider,
@@ -97,12 +98,123 @@ Widget buildItemListRow(double screenHeight, double screenWidth,
                           context,
                         )
                       : ProductCardRow(
-                       product:   list[index],
-                       screenHeight:   screenHeight,
-                       screenWidth:   screenWidth,
+                          product: list[index],
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
                           // context,
                         );
             },
           ),
   );
+}
+
+// New scrollable function for entire page scroll
+Widget buildItemListScrollable(double screenHeight, double screenWidth,
+    PurchaseItemListProvider provider, List<ProductDatum> list) {
+  return provider.filteredProductDatas.isEmpty
+      ? SizedBox(
+          height: screenHeight * 0.5,
+          child: const Center(
+            child: Text(
+              "No Products",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        )
+      : Column(
+          children: [
+            GridView.builder(
+              shrinkWrap: true, // Important: allows grid to size itself
+              physics:
+                  const NeverScrollableScrollPhysics(), // Disable grid's own scrolling
+              padding: const EdgeInsets.only(top: 0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12.0,
+                mainAxisSpacing: 12.0,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                return list.isEmpty
+                    ? const Center(
+                        child: Text(
+                        'No Product to Show',
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ))
+                    : screenWidth >= 600
+                        ? buildProductCardTab(
+                            list[index],
+                            screenHeight,
+                            screenWidth,
+                            context,
+                          )
+                        : ProductCardRow(
+                            product: list[index],
+                            screenHeight: screenHeight,
+                            screenWidth: screenWidth,
+                          );
+              },
+            ),
+          ],
+        );
+}
+
+// New scrollable function for row-based layout (itemlistpage2)
+Widget buildItemListRowScrollable(double screenHeight, double screenWidth,
+    PurchaseItemListProvider provider, List<ProductDatum> list) {
+  return provider.filteredProductDatas.isEmpty
+      ? SizedBox(
+          height: screenHeight * 0.5,
+          child: const Center(
+            child: Text(
+              "No Products",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        )
+      : Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: GridView.builder(
+            shrinkWrap: true, // Important: allows grid to size itself
+            physics:
+                const NeverScrollableScrollPhysics(), // Disable grid's own scrolling
+            padding: const EdgeInsets.only(top: 16, bottom: 16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0, // Better horizontal spacing
+              mainAxisSpacing: 20.0, // Better vertical spacing
+              childAspectRatio: 0.75, // Better aspect ratio for taller cards
+            ),
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              return list.isEmpty
+                  ? const Center(
+                      child: Text(
+                      'No Product to Show',
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                    ))
+                  : screenWidth >= 600
+                      ? buildProductCardTab(
+                          list[index],
+                          screenHeight,
+                          screenWidth,
+                          context,
+                        )
+                      : ProductCardRow(
+                          product: list[index],
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        );
+            },
+          ),
+        );
 }

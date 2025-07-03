@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:easy_stock_app/controllers/providers/masters_provider/customer_master/customer_master_provider.dart';
 import 'package:easy_stock_app/controllers/providers/masters_provider/vehicle_management_provider/vehicle_management_provider.dart';
 import 'package:easy_stock_app/utils/common_widgets/custom_appbar.dart';
-import 'package:easy_stock_app/utils/common_widgets/dropdown_widget.dart';
 import 'package:easy_stock_app/utils/common_widgets/smackbar.dart';
 import 'package:easy_stock_app/utils/common_widgets/yesnoAlertbox.dart';
 import 'package:easy_stock_app/utils/constants/colors/colors.dart';
@@ -213,86 +210,560 @@ class _MastersCustomerAddPageState extends State<MastersCustomerAddPage> {
                   const SizedBox(
                     height: 16,
                   ),
+
+                  const SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isListVisible = !isListVisible;
-                      });
+                    onTap: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          TextEditingController searchController =
+                              TextEditingController();
+                          return StatefulBuilder(
+                            builder: (context, setModalState) {
+                              List filteredVehicles = vehicleManagement_provider
+                                  .vehicles
+                                  .where((c) => c['name']
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(
+                                          searchController.text.toLowerCase()))
+                                  .toList();
+
+                              return Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.7,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(20)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(children: [
+                                      const Text(
+                                        "Select Vehicles",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.27,
+                                        height: 50,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: primaryColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            "Done",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
+                                    const SizedBox(height: 16),
+                                    Container(
+                                      height: 45,
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: TextField(
+                                        controller: searchController,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: 'Search vehicles...',
+                                          hintStyle: TextStyle(
+                                              color: Colors.white
+                                                  .withOpacity(0.5)),
+                                          border: InputBorder.none,
+                                          prefixIcon: Icon(Icons.search,
+                                              color: Colors.white
+                                                  .withOpacity(0.5)),
+                                        ),
+                                        onChanged: (_) => setModalState(() {}),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: filteredVehicles.length,
+                                        padding:
+                                            const EdgeInsets.only(bottom: 10),
+                                        itemBuilder: (context, index) {
+                                          final vehicle =
+                                              filteredVehicles[index];
+                                          final isSelected =
+                                              selectedIndices.contains(
+                                                  vehicleManagement_provider
+                                                      .vehicles
+                                                      .indexOf(vehicle));
+
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  setState(() {
+                                                    int originalIndex =
+                                                        vehicleManagement_provider
+                                                            .vehicles
+                                                            .indexOf(vehicle);
+                                                    if (isSelected) {
+                                                      // If already selected, deselect it
+                                                      selectedIndices.remove(
+                                                          originalIndex);
+                                                      selectedVehicles.remove(
+                                                          vehicle['id'] ?? '');
+                                                    } else {
+                                                      // Otherwise, select it
+                                                      selectedIndices
+                                                          .add(originalIndex);
+                                                      selectedVehicles.add(
+                                                          vehicle['id'] ?? '');
+                                                    }
+                                                    debugPrint(
+                                                        'Selected Vehicles: $selectedVehicles');
+                                                  });
+                                                });
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 16),
+                                                decoration: BoxDecoration(
+                                                  color: isSelected
+                                                      ? primaryColor
+                                                      : Colors.white
+                                                          .withOpacity(0.08),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        vehicle['name'],
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: isSelected
+                                                              ? Colors.black
+                                                              : Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (isSelected)
+                                                      const Icon(
+                                                        Icons.check_circle,
+                                                        color: Colors.black,
+                                                        size: 24,
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    // const SizedBox(height: 16),
+                                    // SizedBox(
+                                    //   width: double.infinity,
+                                    //   height: 50,
+                                    //   child: ElevatedButton(
+                                    //     style: ElevatedButton.styleFrom(
+                                    //       backgroundColor: primaryColor,
+                                    //       shape: RoundedRectangleBorder(
+                                    //         borderRadius:
+                                    //             BorderRadius.circular(12),
+                                    //       ),
+                                    //     ),
+                                    //     onPressed: () {
+                                    //       Navigator.pop(context);
+                                    //     },
+                                    //     child: const Text(
+                                    //       "Done",
+                                    //       style: TextStyle(
+                                    //         color: Colors.black,
+                                    //         fontSize: 16,
+                                    //         fontWeight: FontWeight.w600,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
                     },
                     child: Container(
-                      width: screenWidth * 0.9,
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 16),
                       decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Text(
-                          'Select a vehicle',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white24, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selectedVehicles.isEmpty
+                                  ? 'Select Vehicles'
+                                  : selectedVehicles.join(', '),
+                              style: TextStyle(
+                                color: selectedVehicles.isEmpty
+                                    ? Colors.white54
+                                    : Colors.white,
+                                fontSize: 15,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
+                          const Icon(Icons.keyboard_arrow_down_rounded,
+                              color: Colors.white54),
+                        ],
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: isListVisible,
-                    child: Container(
-                      width: screenWidth * 0.9,
-                      height: screenHeight * 0.2,
-                      color: Colors.grey.shade500,
-                      child: ListView.builder(
-                          padding: EdgeInsets.only(bottom: 10),
-                          shrinkWrap: true,
-                          itemCount: vehicleManagement_provider.vehicles.length,
-                          itemBuilder: (context, index) {
-                            final vehicle =
-                                vehicleManagement_provider.vehicles[index];
-                            final isSelected = selectedIndices.contains(index);
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    if (isSelected) {
-                                      // If already selected, deselect it
-                                      selectedIndices.remove(index);
-                                      selectedVehicles.remove(vehicle['name']);
-                                    } else {
-                                      // Otherwise, select it
-                                      selectedIndices.add(index);
-                                      selectedVehicles
-                                          .add(vehicle['id'] ?? '');
-                                    }
-                                  });
-                                  debugPrint(
-                                      'Selected Vehicles: $selectedVehicles');
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? primaryColor
-                                          : Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '${vehicle['name']}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ),
+
+                  // Visibility(
+                  //   visible: true,
+                  //   child: GestureDetector(
+                  //     onTap: () async {
+                  //       await showModalBottomSheet(
+                  //         context: context,
+                  //         isScrollControlled: true,
+                  //         shape: const RoundedRectangleBorder(
+                  //           borderRadius:
+                  //               BorderRadius.vertical(top: Radius.circular(20)),
+                  //         ),
+                  //         builder: (context) {
+                  //           TextEditingController searchController =
+                  //               TextEditingController();
+                  //           final vehicle =
+                  //               vehicleManagement_provider.vehicles[index];
+                  //           final isSelected = selectedIndices.contains(index);
+                  //           return StatefulBuilder(
+                  //             builder: (context, setModalState) {
+                  //               List filteredVehicles = vehicles
+                  //                   .where((c) => c['name']
+                  //                       .toString()
+                  //                       .toLowerCase()
+                  //                       .contains(searchController.text
+                  //                           .toLowerCase()))
+                  //                   .toList();
+
+                  //               return Container(
+                  //                 height:
+                  //                     MediaQuery.of(context).size.height * 0.7,
+                  //                 padding: const EdgeInsets.all(16),
+                  //                 decoration: BoxDecoration(
+                  //                   color: Colors.black,
+                  //                   borderRadius: const BorderRadius.vertical(
+                  //                       top: Radius.circular(20)),
+                  //                 ),
+                  //                 child: Column(
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.start,
+                  //                   children: [
+                  //                     const Text(
+                  //                       "Select Vehicles",
+                  //                       style: TextStyle(
+                  //                         fontSize: 20,
+                  //                         fontWeight: FontWeight.w600,
+                  //                         color: Colors.white,
+                  //                       ),
+                  //                     ),
+                  //                     const SizedBox(height: 16),
+                  //                     Container(
+                  //                       height: 45,
+                  //                       margin:
+                  //                           const EdgeInsets.only(bottom: 12),
+                  //                       decoration: BoxDecoration(
+                  //                         color: Colors.white.withOpacity(0.08),
+                  //                         borderRadius:
+                  //                             BorderRadius.circular(12),
+                  //                       ),
+                  //                       child: TextField(
+                  //                         controller: searchController,
+                  //                         style: const TextStyle(
+                  //                             color: Colors.white),
+                  //                         decoration: InputDecoration(
+                  //                           hintText: 'Search vehicles...',
+                  //                           hintStyle: TextStyle(
+                  //                               color: Colors.white
+                  //                                   .withOpacity(0.5)),
+                  //                           border: InputBorder.none,
+                  //                           prefixIcon: Icon(Icons.search,
+                  //                               color: Colors.white
+                  //                                   .withOpacity(0.5)),
+                  //                         ),
+                  //                         onChanged: (_) =>
+                  //                             setModalState(() {}),
+                  //                       ),
+                  //                     ),
+                  //                     Expanded(
+                  //                       child: ListView.builder(
+                  //                         itemCount: filteredVehicles.length,
+                  //                         padding:
+                  //                             const EdgeInsets.only(bottom: 10),
+                  //                         itemBuilder: (context, index) {
+                  //                           final vehicle =
+                  //                               filteredVehicles[index];
+                  //                           final isSelected = selectedIds
+                  //                               .contains(vehicle['id']);
+
+                  //                           return Padding(
+                  //                             padding:
+                  //                                 const EdgeInsets.symmetric(
+                  //                                     vertical: 4),
+                  //                             child: GestureDetector(
+                  //                               onTap: () {
+                  //                                 setModalState(() {
+                  //                                   if (isSelected) {
+                  //                                     selectedIds.remove(
+                  //                                         vehicle['id']);
+                  //                                   } else {
+                  //                                     selectedIds
+                  //                                         .add(vehicle['id']);
+                  //                                   }
+                  //                                 });
+                  //                               },
+                  //                               child: Container(
+                  //                                 padding: const EdgeInsets
+                  //                                     .symmetric(
+                  //                                     vertical: 12,
+                  //                                     horizontal: 16),
+                  //                                 decoration: BoxDecoration(
+                  //                                   color: isSelected
+                  //                                       ? primaryColor
+                  //                                       : Colors.white
+                  //                                           .withOpacity(0.08),
+                  //                                   borderRadius:
+                  //                                       BorderRadius.circular(
+                  //                                           12),
+                  //                                 ),
+                  //                                 child: Row(
+                  //                                   children: [
+                  //                                     Expanded(
+                  //                                       child: Text(
+                  //                                         vehicle['name'],
+                  //                                         style: TextStyle(
+                  //                                           fontSize: 16,
+                  //                                           fontWeight:
+                  //                                               FontWeight.w500,
+                  //                                           color: isSelected
+                  //                                               ? Colors.black
+                  //                                               : Colors.white,
+                  //                                         ),
+                  //                                       ),
+                  //                                     ),
+                  //                                     if (isSelected)
+                  //                                       const Icon(
+                  //                                         Icons.check_circle,
+                  //                                         color: Colors.black,
+                  //                                         size: 24,
+                  //                                       ),
+                  //                                   ],
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                           );
+                  //                         },
+                  //                       ),
+                  //                     ),
+                  //                     const SizedBox(height: 16),
+                  //                     SizedBox(
+                  //                       width: double.infinity,
+                  //                       height: 50,
+                  //                       child: ElevatedButton(
+                  //                         style: ElevatedButton.styleFrom(
+                  //                           backgroundColor: primaryColor,
+                  //                           shape: RoundedRectangleBorder(
+                  //                             borderRadius:
+                  //                                 BorderRadius.circular(12),
+                  //                           ),
+                  //                         ),
+                  //                         onPressed: () {
+                  //                           userConfigureProvider
+                  //                               .selectedVehicles(selectedIds);
+                  //                           Navigator.pop(context);
+                  //                         },
+                  //                         child: const Text(
+                  //                           "Done",
+                  //                           style: TextStyle(
+                  //                             color: Colors.black,
+                  //                             fontSize: 16,
+                  //                             fontWeight: FontWeight.w600,
+                  //                           ),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               );
+                  //             },
+                  //           );
+                  //         },
+                  //       );
+                  //     },
+                  //     child: Container(
+                  //       width: double.infinity,
+                  //       padding: const EdgeInsets.symmetric(
+                  //           vertical: 16, horizontal: 16),
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.white.withOpacity(0.08),
+                  //         borderRadius: BorderRadius.circular(12),
+                  //         border: Border.all(color: Colors.white24, width: 1),
+                  //       ),
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Expanded(
+                  //             child: Text(
+                  //               vehicleManagementProvider.vehicles.isEmpty
+                  //                   ? 'Select Vehicles'
+                  //                   : vehicleManagementProvider.vehicles
+                  //                       .where((vehicle) =>
+                  //                           userConfigureProvider
+                  //                               .selectedVehicleIds
+                  //                               .contains(vehicle['id']))
+                  //                       .map((vehicle) => vehicle['name'])
+                  //                       .join(', '),
+                  //               style: TextStyle(
+                  //                 color:
+                  //                     vehicleManagementProvider.vehicles.isEmpty
+                  //                         ? Colors.white54
+                  //                         : Colors.white,
+                  //                 fontSize: 15,
+                  //               ),
+                  //               overflow: TextOverflow.ellipsis,
+                  //               maxLines: 1,
+                  //             ),
+                  //           ),
+                  //           const Icon(Icons.keyboard_arrow_down_rounded,
+                  //               color: Colors.white54),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // --->>>>>...
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     setState(() {
+                  //       isListVisible = !isListVisible;
+                  //     });
+                  //   },
+                  //   child: Container(
+                  //     width: screenWidth * 0.9,
+                  //     decoration: BoxDecoration(
+                  //         color: Colors.black,
+                  //         borderRadius: BorderRadius.circular(12)),
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.all(18.0),
+                  //       child: Text(
+                  //         'Select a vehicle',
+                  //         style: TextStyle(
+                  //           fontSize: 16,
+                  //           fontWeight: FontWeight.w600,
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Visibility(
+                  //   visible: isListVisible,
+                  //   child: Container(
+                  //     width: screenWidth * 0.9,
+                  //     height: screenHeight * 0.2,
+                  //     color: Colors.grey.shade500,
+                  //     child: ListView.builder(
+                  //         padding: EdgeInsets.only(bottom: 10),
+                  //         shrinkWrap: true,
+                  //         itemCount: vehicleManagement_provider.vehicles.length,
+                  //         itemBuilder: (context, index) {
+                  //           final vehicle =
+                  //               vehicleManagement_provider.vehicles[index];
+                  //           final isSelected = selectedIndices.contains(index);
+                  //           return Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: GestureDetector(
+                  //               onTap: () {
+                  //                 setState(() {
+                  //                   if (isSelected) {
+                  //                     // If already selected, deselect it
+                  //                     selectedIndices.remove(index);
+                  //                     selectedVehicles.remove(vehicle['name']);
+                  //                   } else {
+                  //                     // Otherwise, select it
+                  //                     selectedIndices.add(index);
+                  //                     selectedVehicles
+                  //                         .add(vehicle['id'] ?? '');
+                  //                   }
+                  //                 });
+                  //                 debugPrint(
+                  //                     'Selected Vehicles: $selectedVehicles');
+                  //               },
+                  //               child: Container(
+                  //                 decoration: BoxDecoration(
+                  //                     color: isSelected
+                  //                         ? primaryColor
+                  //                         : Colors.grey.shade300,
+                  //                     borderRadius: BorderRadius.circular(12)),
+                  //                 child: Padding(
+                  //                   padding: const EdgeInsets.all(8.0),
+                  //                   child: Text(
+                  //                     '${vehicle['name']}',
+                  //                     style: TextStyle(
+                  //                       fontSize: 16,
+                  //                       fontWeight: FontWeight.w600,
+                  //                       color: Colors.black,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         }),
+                  //   ),
+                  // ),
                   // buildAutoCompleteField(
                   //   mandatory: true,
                   //   hintText: customerManagement_provider
@@ -363,8 +834,7 @@ class _MastersCustomerAddPageState extends State<MastersCustomerAddPage> {
                             return; // Exit early if validation fails
                           }
 
-                          if (
-                              selectedVehicles.isEmpty) {
+                          if (selectedVehicles.isEmpty) {
                             showSnackBarWithsub(
                               context,
                               "Please Select Vehicle",
@@ -384,7 +854,8 @@ class _MastersCustomerAddPageState extends State<MastersCustomerAddPage> {
                               Navigator.pop(context);
                             },
                             onYes: () {
-                              customerManagement_provider.CustomerSave(context,selectedVehicles);
+                              customerManagement_provider.CustomerSave(
+                                  context, selectedVehicles);
                               Navigator.pop(context);
                             },
                             buttonNoText: "No",
